@@ -2,7 +2,7 @@ package zcla71.biblioteca.model;
 
 import com.opencsv.bean.CsvBindByName;
 
-public class LibibData {
+public class LibibCsv {
     @CsvBindByName
     private String item_type;
     @CsvBindByName

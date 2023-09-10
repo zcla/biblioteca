@@ -12,15 +12,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.opencsv.bean.CsvToBeanBuilder;
 
-import zcla71.biblioteca.model.LibibData;
+import zcla71.biblioteca.model.LibibCsv;
 
 @RestController
-public class ImportaLibib {
-    @GetMapping(value="/libib/importa", produces={ MediaType.APPLICATION_JSON_VALUE })
-    public Collection<LibibData> libibImporta() throws FileNotFoundException {
+public class Importa {
+    @GetMapping(value="/importa/libib", produces={ MediaType.APPLICATION_JSON_VALUE })
+    public Collection<LibibCsv> libibImporta() throws FileNotFoundException {
         File file = ResourceUtils.getFile("classpath:libib/library.csv");
-        Collection<LibibData> result = new CsvToBeanBuilder<LibibData>(new FileReader(file))
-            .withType(LibibData.class)
+        Collection<LibibCsv> result = new CsvToBeanBuilder<LibibCsv>(new FileReader(file))
+            .withType(LibibCsv.class)
             .build()
             .parse();
         return result;
