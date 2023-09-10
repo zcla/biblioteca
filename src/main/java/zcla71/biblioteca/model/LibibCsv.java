@@ -1,7 +1,9 @@
 package zcla71.biblioteca.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.opencsv.bean.CsvBindByName;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class LibibCsv {
     @CsvBindByName
     private String item_type;
