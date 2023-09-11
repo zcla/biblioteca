@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.opencsv.bean.CsvBindByName;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class LibibCsv {
+public class LibibLivro {
     @CsvBindByName
     private String item_type;
     @CsvBindByName
