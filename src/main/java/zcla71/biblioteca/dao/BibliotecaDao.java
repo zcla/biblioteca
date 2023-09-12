@@ -1,11 +1,14 @@
 package zcla71.biblioteca.dao;
 
-import java.io.File;
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Collection;
 
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.util.ResourceUtils;
 
 import com.fasterxml.jackson.core.exc.StreamReadException;
@@ -14,19 +17,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opencsv.bean.CsvToBeanBuilder;
 import com.opencsv.enums.CSVReaderNullFieldIndicator;
 
-import zcla71.biblioteca.model.LibibLivro;
 import zcla71.biblioteca.model.app.Config;
 import zcla71.biblioteca.model.app.Secret;
+import zcla71.biblioteca.model.libib.LibibLivro;
 
 public class BibliotecaDao {
-    private static String CONFIG_RESOURCE_LOCATION = "classpath:config.json";
-    private static String SECRET_RESOURCE_LOCATION = "classpath:secret.json";
+    private static String CONFIG_RESOURCE_LOCATION = "config.json";
+    private static String SECRET_RESOURCE_LOCATION = "secret.json";
     private static BibliotecaDao instance = null;
 
     private Object getResource(Class<?> classe, String resourceLocation) throws StreamReadException, DatabindException, IOException {
+        Resource resource = new ClassPathResource(resourceLocation);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(resource.getInputStream()));
         ObjectMapper objectMapper = new ObjectMapper();
-        File file = ResourceUtils.getFile(resourceLocation);
-        return objectMapper.readValue(file, classe);
+        return objectMapper.readValue(reader, classe);
     }
 
     private Object getCsv(Class<?> classe, String resourceLocation) throws IllegalStateException, FileNotFoundException {
