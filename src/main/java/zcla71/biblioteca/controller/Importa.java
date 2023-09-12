@@ -29,16 +29,19 @@ public class Importa {
 
     private Livro libibLivro2Livro(LibibLivro libib) {
         Livro result = new Livro();
+
         String nome = libib.getTitle();
-        String regex = "^(.*)(, )((A|O)s?|El|D(o|a|e))$";
+        String regexIni = "^(.*)(, )((O|A)s?|D(o|a|e)s?|El|L(o|a)s?)";
+        String regex = regexIni + "$";
         if (nome.matches(regex)) {
             nome = nome.replaceFirst(regex, "$3 $1");
         }
-        regex = "^(.*)(, )((A|O)s?)( ?(\\/|-|:) .*)$";
+        regex = regexIni + "( ?(\\/|-|:) .*)$";
         if (nome.matches(regex)) {
-            nome = nome.replaceFirst(regex, "$3 $1$5");
+            nome = nome.replaceFirst(regex, "$3 $1$7");
         }
         result.setNome(nome);
+
         return result;
     }
 
