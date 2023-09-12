@@ -1,4 +1,4 @@
-package zcla71.biblioteca.model;
+package zcla71.biblioteca.model.libib;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.opencsv.bean.CsvBindByName;
