@@ -17,9 +17,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opencsv.bean.CsvToBeanBuilder;
 import com.opencsv.enums.CSVReaderNullFieldIndicator;
 
-import zcla71.biblioteca.model.app.Config;
-import zcla71.biblioteca.model.app.Secret;
+import zcla71.biblioteca.model.config.Config;
 import zcla71.biblioteca.model.libib.LibibLivro;
+import zcla71.biblioteca.model.secret.Secret;
 
 public class BibliotecaDao {
     private static String CONFIG_RESOURCE_LOCATION = "config.json";
@@ -62,6 +62,6 @@ public class BibliotecaDao {
 
     @SuppressWarnings("unchecked")
     public Collection<LibibLivro> getLibibLivros() throws StreamReadException, DatabindException, IllegalStateException, FileNotFoundException, IOException {
-        return (Collection<LibibLivro>) getCsv(LibibLivro.class, getConfig().getLibibCsvFileLocation());
+        return (Collection<LibibLivro>) getCsv(LibibLivro.class, getConfig().getLibib().getCsvFileLocation());
     }
 }

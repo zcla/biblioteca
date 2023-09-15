@@ -1,3 +1,28 @@
 {
-    "libibCsvFileLocation": "classpath:libib/library.csv"
+    "libib": {
+        "csvFileLocation": "classpath:libib/library.csv"
+    },
+    "seaTable": {
+        "biblioteca": {
+            "tables": [
+                {
+                    "table_name": "livro",
+                    "columns": [
+                        {
+                            "column_name": "id",
+                            "column_type": "number",
+                            "column_data": {
+                                "format": "number",
+                                "thousands": "no"
+                            }
+                        },
+                        {
+                            "column_name": "nome",
+                            "column_type": "text"
+                        }
+                    ]
+                }
+            ]
+        }
+    }
 }

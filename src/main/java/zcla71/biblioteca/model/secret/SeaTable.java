@@ -1,6 +1,6 @@
-package zcla71.biblioteca.model.app;
+package zcla71.biblioteca.model.secret;
 
-public class Secret {
+public class SeaTable {
     private String apiToken;
 
     public String getApiToken() {

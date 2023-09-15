@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.NoSuchElementException;
 
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,8 +17,12 @@ import com.fasterxml.jackson.databind.DatabindException;
 import zcla71.biblioteca.dao.BibliotecaDao;
 import zcla71.biblioteca.dao.SeaTableDao;
 import zcla71.biblioteca.model.Livro;
-import zcla71.biblioteca.model.app.Secret;
+import zcla71.biblioteca.model.config.Config;
 import zcla71.biblioteca.model.libib.LibibLivro;
+import zcla71.biblioteca.model.seatable.ddl.TableDef;
+import zcla71.biblioteca.model.seatable.metadata.Metadata;
+import zcla71.biblioteca.model.seatable.metadata.Table;
+import zcla71.biblioteca.model.secret.Secret;
 
 @RestController
 @RequestMapping(produces={ MediaType.APPLICATION_JSON_VALUE })
@@ -48,6 +53,7 @@ public class Importa {
     @GetMapping(value="/importa/seatable")
     public Collection<Livro> importaSeatable() throws StreamReadException, DatabindException, IOException {
         Secret secret = BibliotecaDao.getInstance().getSecret();
+        Config config = BibliotecaDao.getInstance().getConfig();
         Collection<LibibLivro> libibLivros = importaLibib();
         Collection<Livro> result = new ArrayList<Livro>();
         for (LibibLivro libibLivro : libibLivros) {
@@ -55,7 +61,23 @@ public class Importa {
             result.add(livro);
         }
 
-        SeaTableDao dao = new SeaTableDao(secret.getApiToken());
+        SeaTableDao dao = new SeaTableDao(secret.getSeaTable().getApiToken());
+        Metadata metadata = dao.getMetadata();
+
+        for (TableDef tableDef : config.getSeaTable().getBiblioteca().getTables()) {
+            try {
+                @SuppressWarnings("unused")
+                Table table = metadata.getMetadata().getTables().stream()
+                    .filter(t -> t.getName().equals(tableDef.getTable_name()))
+                    .findFirst()
+                    .get();
+            } catch (NoSuchElementException e) {
+                @SuppressWarnings("unused")
+                Table tableMetadata = dao.createTable(tableDef);
+            }
+        }
+
+        // TODO Excluir tabelas alienígienas
 
         return result;
     }
