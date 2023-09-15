@@ -15,16 +15,16 @@ import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
 
 import zcla71.biblioteca.dao.BibliotecaDao;
-import zcla71.biblioteca.dao.SeaTableDao;
 import zcla71.biblioteca.model.Livro;
 import zcla71.biblioteca.model.config.Config;
 import zcla71.biblioteca.model.libib.LibibLivro;
-import zcla71.biblioteca.model.seatable.Success;
-import zcla71.biblioteca.model.seatable.ddl.TableDef;
-import zcla71.biblioteca.model.seatable.ddl.TableDeleteDef;
-import zcla71.biblioteca.model.seatable.metadata.Metadata;
-import zcla71.biblioteca.model.seatable.metadata.Table;
 import zcla71.biblioteca.model.secret.Secret;
+import zcla71.seatable.SeaTableConnection;
+import zcla71.seatable.model.Success;
+import zcla71.seatable.model.ddl.TableDef;
+import zcla71.seatable.model.ddl.TableDeleteDef;
+import zcla71.seatable.model.metadata.Metadata;
+import zcla71.seatable.model.metadata.Table;
 
 @RestController
 @RequestMapping(produces={ MediaType.APPLICATION_JSON_VALUE })
@@ -63,7 +63,7 @@ public class Importa {
             result.add(livro);
         }
 
-        SeaTableDao dao = new SeaTableDao(secret.getSeaTable().getApiToken());
+        SeaTableConnection dao = new SeaTableConnection(secret.getSeaTable().getApiToken());
         Metadata metadata = dao.getMetadata();
 
         // Cria as tabelas que não existem
@@ -95,7 +95,10 @@ public class Importa {
             }
         }
 
-        // TODO Inserir dados
+        // Insere dados
+        for (Livro livro : result) {
+            // dao.insert("livro", livro);
+        }
 
         return result;
     }

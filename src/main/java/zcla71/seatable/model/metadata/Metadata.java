@@ -1,4 +1,4 @@
-package zcla71.biblioteca.model.seatable.metadata;
+package zcla71.seatable.model.metadata;
 
 public class Metadata {
     private MetadataMetadata metadata;

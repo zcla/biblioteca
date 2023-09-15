@@ -2,7 +2,7 @@ package zcla71.biblioteca.model.config;
 
 import java.util.Collection;
 
-import zcla71.biblioteca.model.seatable.ddl.TableDef;
+import zcla71.seatable.model.ddl.TableDef;
 
 public class SeaTableBase {
     private String name;

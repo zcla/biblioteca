@@ -1,6 +1,6 @@
-package zcla71.biblioteca.model.seatable.ddl;
+package zcla71.seatable.model.ddl;
 
-import zcla71.biblioteca.model.seatable.metadata.Table;
+import zcla71.seatable.model.metadata.Table;
 
 public class TableDeleteDef {
     private String table_name;

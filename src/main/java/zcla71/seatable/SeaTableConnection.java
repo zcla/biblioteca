@@ -1,4 +1,4 @@
-package zcla71.biblioteca.dao;
+package zcla71.seatable;
 
 import java.io.IOException;
 
@@ -9,19 +9,19 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 
-import zcla71.biblioteca.model.seatable.BaseToken;
-import zcla71.biblioteca.model.seatable.Success;
-import zcla71.biblioteca.model.seatable.ddl.TableDef;
-import zcla71.biblioteca.model.seatable.ddl.TableDeleteDef;
-import zcla71.biblioteca.model.seatable.metadata.Metadata;
-import zcla71.biblioteca.model.seatable.metadata.Table;
+import zcla71.seatable.model.BaseToken;
+import zcla71.seatable.model.Success;
+import zcla71.seatable.model.ddl.TableDef;
+import zcla71.seatable.model.ddl.TableDeleteDef;
+import zcla71.seatable.model.metadata.Metadata;
+import zcla71.seatable.model.metadata.Table;
 
-public class SeaTableDao {
+public class SeaTableConnection {
     // https://api.seatable.io/reference
 
     private BaseToken baseToken = null;
 
-    public SeaTableDao(String apiToken) throws IOException {
+    public SeaTableConnection(String apiToken) throws IOException {
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
             .url("https://cloud.seatable.io/api/v2.1/dtable/app-access-token/")
@@ -88,4 +88,7 @@ public class SeaTableDao {
         String responseBody = response.body().string();
         return objectMapper.readValue(responseBody, Success.class);
     }
+
+    // public Object insertRow(String string, RowDef rowDef) {
+    // }
 }

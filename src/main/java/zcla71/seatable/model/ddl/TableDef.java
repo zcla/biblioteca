@@ -1,4 +1,4 @@
-package zcla71.biblioteca.model.seatable.ddl;
+package zcla71.seatable.model.ddl;
 
 import java.util.Collection;
 

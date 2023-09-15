@@ -1,4 +1,4 @@
-package zcla71.biblioteca.model.seatable;
+package zcla71.seatable.model;
 
 public class BaseToken {
     private String app_name;
