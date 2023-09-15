@@ -1,6 +1,6 @@
 package zcla71.biblioteca.model.config;
 
-public class Libib {
+public class LibibConfig {
     private String csvFileLocation;
 
     public String getCsvFileLocation() {

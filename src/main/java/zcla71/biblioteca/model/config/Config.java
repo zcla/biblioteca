@@ -1,22 +1,22 @@
 package zcla71.biblioteca.model.config;
 
 public class Config {
-    private Libib libib;
-    private SeaTable seaTable;
+    private LibibConfig libib;
+    private SeaTableConfig seaTable;
 
-    public Libib getLibib() {
+    public LibibConfig getLibib() {
         return libib;
     }
 
-    public void setLibib(Libib libib) {
+    public void setLibib(LibibConfig libib) {
         this.libib = libib;
     }
 
-    public SeaTable getSeaTable() {
+    public SeaTableConfig getSeaTable() {
         return seaTable;
     }
 
-    public void setSeaTable(SeaTable seaTable) {
+    public void setSeaTable(SeaTableConfig seaTable) {
         this.seaTable = seaTable;
     }
 }

@@ -1,13 +1,13 @@
 package zcla71.biblioteca.model.secret;
 
 public class Secret {
-    private SeaTable seaTable;
+    private SeaTableSecret seaTable;
 
-    public SeaTable getSeaTable() {
+    public SeaTableSecret getSeaTable() {
         return seaTable;
     }
 
-    public void setSeaTable(SeaTable seaTable) {
+    public void setSeaTable(SeaTableSecret seaTable) {
         this.seaTable = seaTable;
     }
 }

@@ -1,6 +1,6 @@
 package zcla71.biblioteca.model.config;
 
-public class SeaTable {
+public class SeaTableConfig {
     private SeaTableBase biblioteca;
 
     public SeaTableBase getBiblioteca() {
