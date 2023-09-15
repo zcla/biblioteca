@@ -19,7 +19,9 @@ import zcla71.biblioteca.dao.SeaTableDao;
 import zcla71.biblioteca.model.Livro;
 import zcla71.biblioteca.model.config.Config;
 import zcla71.biblioteca.model.libib.LibibLivro;
+import zcla71.biblioteca.model.seatable.Success;
 import zcla71.biblioteca.model.seatable.ddl.TableDef;
+import zcla71.biblioteca.model.seatable.ddl.TableDeleteDef;
 import zcla71.biblioteca.model.seatable.metadata.Metadata;
 import zcla71.biblioteca.model.seatable.metadata.Table;
 import zcla71.biblioteca.model.secret.Secret;
@@ -64,6 +66,7 @@ public class Importa {
         SeaTableDao dao = new SeaTableDao(secret.getSeaTable().getApiToken());
         Metadata metadata = dao.getMetadata();
 
+        // Cria as tabelas que não existem
         for (TableDef tableDef : config.getSeaTable().getBiblioteca().getTables()) {
             try {
                 @SuppressWarnings("unused")
@@ -77,7 +80,22 @@ public class Importa {
             }
         }
 
-        // TODO Excluir tabelas alienígienas
+        // Exclui tabelas que não deveriam existir
+        for (Table table : metadata.getMetadata().getTables()) {
+            try {
+                @SuppressWarnings("unused")
+                TableDef tableDef = config.getSeaTable().getBiblioteca().getTables().stream()
+                    .filter(t -> t.getTable_name().equals(table.getName()))
+                    .findFirst()
+                    .get();
+            } catch (NoSuchElementException e) {
+                TableDeleteDef tableDeleteDef = new TableDeleteDef(table);
+                @SuppressWarnings("unused")
+                Success success = dao.deleteTable(tableDeleteDef);
+            }
+        }
+
+        // TODO Inserir dados
 
         return result;
     }
