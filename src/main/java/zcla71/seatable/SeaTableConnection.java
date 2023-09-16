@@ -11,10 +11,12 @@ import com.squareup.okhttp.Response;
 
 import zcla71.seatable.model.BaseToken;
 import zcla71.seatable.model.ddl.RowDef;
+import zcla71.seatable.model.ddl.RowsDef;
 import zcla71.seatable.model.ddl.TableDef;
 import zcla71.seatable.model.ddl.TableDeleteDef;
 import zcla71.seatable.model.metadata.Metadata;
 import zcla71.seatable.model.metadata.Table;
+import zcla71.seatable.model.result.AppendRowsResult;
 import zcla71.seatable.model.result.DeleteTableResult;
 import zcla71.seatable.model.result.InsertRowResult;
 
@@ -91,7 +93,7 @@ public class SeaTableConnection {
         return objectMapper.readValue(responseBody, DeleteTableResult.class);
     }
 
-    public InsertRowResult insertRow(String string, RowDef rowDef) throws IOException {
+    public InsertRowResult insertRow(RowDef rowDef) throws IOException {
         OkHttpClient client = new OkHttpClient();
         MediaType mediaType = MediaType.parse("application/json");
         ObjectMapper objectMapper = new ObjectMapper();
@@ -110,5 +112,26 @@ public class SeaTableConnection {
         }
         String responseBody = response.body().string();
         return objectMapper.readValue(responseBody, InsertRowResult.class);
+    }
+
+    public AppendRowsResult appendRows(RowsDef rowsDef) throws IOException {
+        OkHttpClient client = new OkHttpClient();
+        MediaType mediaType = MediaType.parse("application/json");
+        ObjectMapper objectMapper = new ObjectMapper();
+        String strBody = objectMapper.writeValueAsString(rowsDef);
+        RequestBody body = RequestBody.create(mediaType, strBody);
+        Request request = new Request.Builder()
+            .url("https://cloud.seatable.io/dtable-server/api/v1/dtables/" + baseToken.getDtable_uuid() + "/batch-append-rows/")
+            .post(body)
+            .addHeader("accept", "application/json")
+            .addHeader("content-type", "application/json")
+            .addHeader("authorization", "Bearer " + baseToken.getAccess_token())
+            .build();
+        Response response = client.newCall(request).execute();
+        if (response.code() != 200) {
+            throw new RuntimeException(response.message());
+        }
+        String responseBody = response.body().string();
+        return objectMapper.readValue(responseBody, AppendRowsResult.class);
     }
 }
