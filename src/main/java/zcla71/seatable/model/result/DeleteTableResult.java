@@ -1,6 +1,6 @@
-package zcla71.seatable.model;
+package zcla71.seatable.model.result;
 
-public class Success {
+public class DeleteTableResult {
     private Boolean success;
 
     public Boolean getSuccess() {

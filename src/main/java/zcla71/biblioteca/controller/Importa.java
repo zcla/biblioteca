@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.NoSuchElementException;
 
 import org.springframework.http.MediaType;
@@ -20,11 +21,13 @@ import zcla71.biblioteca.model.config.Config;
 import zcla71.biblioteca.model.libib.LibibLivro;
 import zcla71.biblioteca.model.secret.Secret;
 import zcla71.seatable.SeaTableConnection;
-import zcla71.seatable.model.Success;
+import zcla71.seatable.model.ddl.RowDef;
 import zcla71.seatable.model.ddl.TableDef;
 import zcla71.seatable.model.ddl.TableDeleteDef;
 import zcla71.seatable.model.metadata.Metadata;
 import zcla71.seatable.model.metadata.Table;
+import zcla71.seatable.model.result.DeleteTableResult;
+import zcla71.seatable.model.result.InsertRowResult;
 
 @RestController
 @RequestMapping(produces={ MediaType.APPLICATION_JSON_VALUE })
@@ -36,6 +39,10 @@ public class Importa {
 
     private Livro libibLivro2Livro(LibibLivro libib) {
         Livro result = new Livro();
+
+        // TODO Fazer direito
+        Integer id = 1;
+        result.setId(id);
 
         String nome = libib.getTitle();
         String regexIni = "^(.*)(, )((O|A)s?|D(o|a|e)s?|El|L(o|a)s?)";
@@ -91,13 +98,20 @@ public class Importa {
             } catch (NoSuchElementException e) {
                 TableDeleteDef tableDeleteDef = new TableDeleteDef(table);
                 @SuppressWarnings("unused")
-                Success success = dao.deleteTable(tableDeleteDef);
+                DeleteTableResult success = dao.deleteTable(tableDeleteDef);
             }
         }
 
         // Insere dados
+        // TODO Lento DEMAIS (3:32)! Tentar o "Append Rows": https://api.seatable.io/reference/append-rows
         for (Livro livro : result) {
-            // dao.insert("livro", livro);
+            RowDef rowDef = new RowDef();
+            rowDef.setTable_name("livro");
+            rowDef.setRow(new HashMap<>());
+            rowDef.getRow().put("id", livro.getId().toString());
+            rowDef.getRow().put("nome", livro.getNome());
+            InsertRowResult obj = dao.insertRow("livro", rowDef);
+            System.out.println(obj);
         }
 
         return result;
