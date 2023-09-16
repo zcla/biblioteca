@@ -6,6 +6,14 @@ public class TableDef {
     private String table_name;
     private Collection<ColumnDef> columns;
 
+    public TableDef() {
+    }
+
+    public TableDef(String table_name, Collection<ColumnDef> columns) {
+        this.table_name = table_name;
+        this.columns = columns;
+    }
+
     public String getTable_name() {
         return table_name;
     }

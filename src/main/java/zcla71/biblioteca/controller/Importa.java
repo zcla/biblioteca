@@ -4,12 +4,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,14 +20,19 @@ import zcla71.biblioteca.model.Livro;
 import zcla71.biblioteca.model.config.Config;
 import zcla71.biblioteca.model.libib.LibibLivro;
 import zcla71.biblioteca.model.secret.Secret;
-import zcla71.seatable.SeaTableConnection;
-import zcla71.seatable.model.ddl.RowsDef;
+import zcla71.seatable.SeaTableApi;
 import zcla71.seatable.model.ddl.TableDef;
-import zcla71.seatable.model.ddl.TableDeleteDef;
 import zcla71.seatable.model.metadata.Metadata;
+import zcla71.seatable.model.metadata.Row;
 import zcla71.seatable.model.metadata.Table;
+import zcla71.seatable.model.param.AppendRowsParam;
+import zcla71.seatable.model.param.CreateNewTableParam;
+import zcla71.seatable.model.param.AddRowParam;
+import zcla71.seatable.model.param.DeleteTableParam;
 import zcla71.seatable.model.result.AppendRowsResult;
+import zcla71.seatable.model.result.CreateNewTableResult;
 import zcla71.seatable.model.result.DeleteTableResult;
+import zcla71.seatable.model.result.AddRowResult;
 
 @RestController
 @RequestMapping(produces={ MediaType.APPLICATION_JSON_VALUE })
@@ -60,7 +64,7 @@ public class Importa {
         return result;
     }
 
-    @GetMapping(value="/importa/seatable")
+    @PostMapping(value="/importa/seatable")
     public Collection<Livro> importaSeatable() throws StreamReadException, DatabindException, IOException {
         Secret secret = BibliotecaDao.getInstance().getSecret();
         Config config = BibliotecaDao.getInstance().getConfig();
@@ -71,8 +75,8 @@ public class Importa {
             result.add(livro);
         }
 
-        SeaTableConnection dao = new SeaTableConnection(secret.getSeaTable().getApiToken());
-        Metadata metadata = dao.getMetadata();
+        SeaTableApi api = new SeaTableApi(secret.getSeaTable().getApiToken());
+        Metadata metadata = api.getMetadata();
 
         // Cria as tabelas que não existem
         for (TableDef tableDef : config.getSeaTable().getBiblioteca().getTables()) {
@@ -84,7 +88,7 @@ public class Importa {
                     .get();
             } catch (NoSuchElementException e) {
                 @SuppressWarnings("unused")
-                Table tableMetadata = dao.createTable(tableDef);
+                CreateNewTableResult cTableParamResult = api.createNewTable(new CreateNewTableParam(tableDef));
             }
         }
 
@@ -97,35 +101,37 @@ public class Importa {
                     .findFirst()
                     .get();
             } catch (NoSuchElementException e) {
-                TableDeleteDef tableDeleteDef = new TableDeleteDef(table);
+                DeleteTableParam tableDeleteDef = new DeleteTableParam(table);
                 @SuppressWarnings("unused")
-                DeleteTableResult success = dao.deleteTable(tableDeleteDef);
+                DeleteTableResult success = api.deleteTable(tableDeleteDef);
             }
         }
 
         // Insere dados
-        // // Versão um por um (lenta demais)
-        // for (Livro livro : result) {
-        //     RowDef rowDef = new RowDef();
-        //     rowDef.setTable_name("livro");
-        //     rowDef.setRow(new HashMap<>());
-        //     rowDef.getRow().put("id", livro.getId().toString());
-        //     rowDef.getRow().put("nome", livro.getNome());
-        //     InsertRowResult obj = dao.insertRow(rowDef);
-        //     System.out.println(obj);
-        // }
-        // Versão batch
-        RowsDef rowsDef = new RowsDef();
-        rowsDef.setTable_name("livro");
-        rowsDef.setRows(new ArrayList<>());
-        for (Livro livro : result) {
-            Map<String, String> rowData = new HashMap<>();
-            rowData.put("id", livro.getId().toString());
-            rowData.put("nome", livro.getNome());
-            rowsDef.getRows().add(rowData);
+        final boolean forceOneByOne = false;
+        if (forceOneByOne) { // Versão um por um (lenta)
+            for (Livro livro : result) {
+                AddRowParam param = new AddRowParam();
+                param.setTable_name("livro");
+                param.setRow(new Row());
+                param.getRow().put("id", livro.getId().toString());
+                param.getRow().put("nome", livro.getNome());
+                @SuppressWarnings("unused")
+                AddRowResult irResult = api.addRow(param);
+            }
+        } else { // Versão batch
+            AppendRowsParam param = new AppendRowsParam();
+            param.setTable_name("livro");
+            param.setRows(new ArrayList<>());
+            for (Livro livro : result) {
+                Row row = new Row();
+                row.put("id", livro.getId().toString());
+                row.put("nome", livro.getNome());
+                param.getRows().add(row);
+            }
+            @SuppressWarnings("unused")
+            AppendRowsResult arResult = api.appendRows(param);
         }
-        @SuppressWarnings("unused")
-        AppendRowsResult obj = dao.appendRows(rowsDef);
 
         return result;
     }

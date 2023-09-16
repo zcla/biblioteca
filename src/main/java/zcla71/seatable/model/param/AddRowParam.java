@@ -1,16 +1,16 @@
-package zcla71.seatable.model.ddl;
+package zcla71.seatable.model.param;
 
-import java.util.Map;
+import zcla71.seatable.model.metadata.Row;
 
-public class RowDef {
-    private Map<String, String> row;
+public class AddRowParam {
+    private Row row;
     private String table_name;
 
-    public Map<String, String> getRow() {
+    public Row getRow() {
         return row;
     }
 
-    public void setRow(Map<String, String> row) {
+    public void setRow(Row row) {
         this.row = row;
     }
 

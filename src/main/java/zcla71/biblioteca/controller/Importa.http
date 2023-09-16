@@ -1,0 +1,8 @@
+### Mostra CSV do Libib
+GET http://localhost:8080/importa/libib
+
+### Exporta CSV do Libib pro SeaTable
+# Stats em 16/09/2023 (763 registros):
+# - forceOneByOne = true  => 197273ms
+# - forceOneByOne = false =>   1135ms
+POST http://localhost:8080/importa/seatable

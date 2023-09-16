@@ -1,17 +1,18 @@
-package zcla71.seatable.model.ddl;
+package zcla71.seatable.model.param;
 
 import java.util.Collection;
-import java.util.Map;
 
-public class RowsDef {
-    private Collection<Map<String, String>> rows;
+import zcla71.seatable.model.metadata.Row;
+
+public class AppendRowsParam {
+    private Collection<Row> rows;
     private String table_name;
 
-    public Collection<Map<String, String>> getRows() {
+    public Collection<Row> getRows() {
         return rows;
     }
 
-    public void setRows(Collection<Map<String, String>> rows) {
+    public void setRows(Collection<Row> rows) {
         this.rows = rows;
     }
 

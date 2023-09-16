@@ -14,6 +14,24 @@ public class Table {
     private Collection<View> views;
     private Object id_row_map; // TODO Object -> class
 
+    public Table() {
+    }
+
+    public Table(String _id, String name, Boolean is_header_locked, Object header_settings, Object summary_configs,
+            Collection<Column> columns, Collection<Object> rows, ViewStructure view_structure, Collection<View> views,
+            Object id_row_map) {
+        this._id = _id;
+        this.name = name;
+        this.is_header_locked = is_header_locked;
+        this.header_settings = header_settings;
+        this.summary_configs = summary_configs;
+        this.columns = columns;
+        this.rows = rows;
+        this.view_structure = view_structure;
+        this.views = views;
+        this.id_row_map = id_row_map;
+    }
+
     public String get_id() {
         return _id;
     }
