@@ -28,9 +28,9 @@ public class SeaTableApi {
         baseToken = generateBaseToken(apiToken);
     }
 
-    // Introduction
+    // Authentication
 
-    // https://api.seatable.io/reference/introduction#step-2-generate-base-token
+    // https://api.seatable.io/reference/get-base-token-with-api-token
     private BaseToken generateBaseToken(String apiToken) throws IOException {
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
