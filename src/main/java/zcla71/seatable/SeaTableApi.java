@@ -13,11 +13,15 @@ import zcla71.seatable.model.BaseToken;
 import zcla71.seatable.model.metadata.Metadata;
 import zcla71.seatable.model.param.AppendRowsParam;
 import zcla71.seatable.model.param.CreateNewTableParam;
+import zcla71.seatable.model.param.DeleteRowsParam;
 import zcla71.seatable.model.param.AddRowParam;
 import zcla71.seatable.model.param.DeleteTableParam;
+import zcla71.seatable.model.param.ListRowsParam;
 import zcla71.seatable.model.result.AppendRowsResult;
 import zcla71.seatable.model.result.CreateNewTableResult;
+import zcla71.seatable.model.result.DeleteRowsResult;
 import zcla71.seatable.model.result.DeleteTableResult;
+import zcla71.seatable.model.result.ListRowsResult;
 import zcla71.seatable.model.result.AddRowResult;
 
 // https://api.seatable.io/reference
@@ -62,6 +66,21 @@ public class SeaTableApi {
 
     // Rows
 
+    // https://api.seatable.io/reference/list-rows
+    public ListRowsResult listRows(ListRowsParam param) throws IOException {
+        OkHttpClient client = new OkHttpClient();
+        String url = "https://cloud.seatable.io/dtable-server/api/v1/dtables/" + baseToken.getDtable_uuid() + "/rows/" + param.getUrlParams();
+        Request request = new Request.Builder()
+            .url(url)
+            .get()
+            .addHeader("accept", "application/json")
+            .addHeader("authorization", "Bearer " + baseToken.getAccess_token())
+            .build();
+        Response response = client.newCall(request).execute();
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.readValue(response.body().string(), ListRowsResult.class);
+    }
+
     // https://api.seatable.io/reference/add-row
     public AddRowResult addRow(AddRowParam param) throws IOException {
         OkHttpClient client = new OkHttpClient();
@@ -104,6 +123,28 @@ public class SeaTableApi {
         }
         String responseBody = response.body().string();
         return objectMapper.readValue(responseBody, AppendRowsResult.class);
+    }
+
+    // https://api.seatable.io/reference/delete-rows
+    public DeleteRowsResult deleteRows(DeleteRowsParam param) throws IOException {
+        OkHttpClient client = new OkHttpClient();
+        MediaType mediaType = MediaType.parse("application/json");
+        ObjectMapper objectMapper = new ObjectMapper();
+        String strBody = objectMapper.writeValueAsString(param);
+        RequestBody body = RequestBody.create(mediaType, strBody);
+        Request request = new Request.Builder()
+            .url("https://cloud.seatable.io/dtable-server/api/v1/dtables/" + baseToken.getDtable_uuid() + "/batch-delete-rows/")
+            .delete(body)
+            .addHeader("accept", "application/json")
+            .addHeader("content-type", "application/json")
+            .addHeader("authorization", "Bearer " + baseToken.getAccess_token())
+            .build();
+        Response response = client.newCall(request).execute();
+        if (response.code() != 200) {
+            throw new RuntimeException(response.message());
+        }
+        String responseBody = response.body().string();
+        return objectMapper.readValue(responseBody, DeleteRowsResult.class);
     }
 
     // Tables

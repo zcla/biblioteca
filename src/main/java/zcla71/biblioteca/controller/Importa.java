@@ -27,11 +27,15 @@ import zcla71.seatable.model.metadata.Row;
 import zcla71.seatable.model.metadata.Table;
 import zcla71.seatable.model.param.AppendRowsParam;
 import zcla71.seatable.model.param.CreateNewTableParam;
+import zcla71.seatable.model.param.DeleteRowsParam;
 import zcla71.seatable.model.param.AddRowParam;
 import zcla71.seatable.model.param.DeleteTableParam;
+import zcla71.seatable.model.param.ListRowsParam;
 import zcla71.seatable.model.result.AppendRowsResult;
 import zcla71.seatable.model.result.CreateNewTableResult;
+import zcla71.seatable.model.result.DeleteRowsResult;
 import zcla71.seatable.model.result.DeleteTableResult;
+import zcla71.seatable.model.result.ListRowsResult;
 import zcla71.seatable.model.result.AddRowResult;
 
 @RestController
@@ -104,6 +108,25 @@ public class Importa {
                 DeleteTableParam tableDeleteDef = new DeleteTableParam(table);
                 @SuppressWarnings("unused")
                 DeleteTableResult success = api.deleteTable(tableDeleteDef);
+            }
+        }
+
+        // Exclui dados das tabelas
+        for (Table table : metadata.getMetadata().getTables()) {
+            while (true) {
+                ListRowsParam lrp = new ListRowsParam(table.getName());
+                ListRowsResult lrr = api.listRows(lrp);
+                if (lrr.getRows().size() == 0) {
+                    break;
+                }
+                DeleteRowsParam param = new DeleteRowsParam();
+                param.setTable_name("livro");
+                param.setRow_ids(new ArrayList<>());
+                for (Row row : lrr.getRows()) {
+                    param.getRow_ids().add(row.get("_id"));
+                }
+                @SuppressWarnings("unused")
+                DeleteRowsResult drResult = api.deleteRows(param);
             }
         }
 
