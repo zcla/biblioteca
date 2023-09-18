@@ -1,11 +1,8 @@
 package zcla71.biblioteca.model;
 
-import java.util.Collection;
-
-public class Livro {
+public class Autor {
     private Integer id;
     private String nome;
-    private Collection<Autor> autores;
 
     public Integer getId() {
         return id;
@@ -21,13 +18,5 @@ public class Livro {
 
     public void setNome(String nome) {
         this.nome = nome;
-    }
-
-    public Collection<Autor> getAutores() {
-        return autores;
-    }
-
-    public void setAutores(Collection<Autor> autores) {
-        this.autores = autores;
     }
 }

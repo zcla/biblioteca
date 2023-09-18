@@ -10,7 +10,7 @@ public class Column {
     private Integer width;
     private Boolean resizable;
     private Boolean draggable;
-    private Object data; // TODO Object -> class
+    private ColumnData data;
     private String permission_type;
     private Collection<Object> permitted_users; // TODO Object -> class
     private String edit_metadata_permission_type;
@@ -73,11 +73,11 @@ public class Column {
         this.draggable = draggable;
     }
 
-    public Object getData() {
+    public ColumnData getData() {
         return data;
     }
 
-    public void setData(Object data) {
+    public void setData(ColumnData data) {
         this.data = data;
     }
 
