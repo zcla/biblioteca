@@ -35,9 +35,11 @@ import zcla71.seatable.model.result.AddRowResult;
 
 // https://api.seatable.io/reference
 public class SeaTableApi {
+    private ObjectMapper objectMapper;
     private BaseToken baseToken = null;
     
     public SeaTableApi(String apiToken) throws IOException {
+        objectMapper = new ObjectMapper();
         baseToken = generateBaseToken(apiToken);
     }
 
@@ -53,34 +55,37 @@ public class SeaTableApi {
             .addHeader("authorization", "Bearer " + apiToken)
             .build();
         Response response = client.newCall(request).execute();
-        ObjectMapper objectMapper = new ObjectMapper();
         String responseBody = response.body().string();
+        if (response.code() != 200) {
+            throw new RuntimeException(responseBody, new RuntimeException(response.message()));
+        }
         return objectMapper.readValue(responseBody, BaseToken.class);
     }
 
-    // Base Info
+    // Métodos genéricos
 
-    // https://api.seatable.io/reference/get-metadata
-    public Metadata getMetadata() throws IOException {
+    public Object doDelete(String url, Object param, Class<? extends Object> resultClass) throws IOException {
         OkHttpClient client = new OkHttpClient();
+        MediaType mediaType = MediaType.parse("application/json");
+        String strBody = objectMapper.writeValueAsString(param);
+        RequestBody body = RequestBody.create(mediaType, strBody);
         Request request = new Request.Builder()
-            .url("https://cloud.seatable.io/dtable-server/api/v1/dtables/" + baseToken.getDtable_uuid() + "/metadata/")
-            .get()
+            .url(url)
+            .delete(body)
             .addHeader("accept", "application/json")
+            .addHeader("content-type", "application/json")
             .addHeader("authorization", "Bearer " + baseToken.getAccess_token())
             .build();
         Response response = client.newCall(request).execute();
-        ObjectMapper objectMapper = new ObjectMapper();
         String responseBody = response.body().string();
-        return objectMapper.readValue(responseBody, Metadata.class);
+        if (response.code() != 200) {
+            throw new RuntimeException(responseBody, new RuntimeException(response.message()));
+        }
+        return objectMapper.readValue(responseBody, resultClass);
     }
 
-    // Rows
-
-    // https://api.seatable.io/reference/list-rows
-    public ListRowsResult listRows(ListRowsParam param) throws IOException {
+    public Object doGet(String url, Class<? extends Object> resultClass) throws IOException {
         OkHttpClient client = new OkHttpClient();
-        String url = "https://cloud.seatable.io/dtable-server/api/v1/dtables/" + baseToken.getDtable_uuid() + "/rows/" + param.getUrlParams();
         Request request = new Request.Builder()
             .url(url)
             .get()
@@ -88,99 +93,73 @@ public class SeaTableApi {
             .addHeader("authorization", "Bearer " + baseToken.getAccess_token())
             .build();
         Response response = client.newCall(request).execute();
-        ObjectMapper objectMapper = new ObjectMapper();
         String responseBody = response.body().string();
-        return objectMapper.readValue(responseBody, ListRowsResult.class);
+        if (response.code() != 200) {
+            throw new RuntimeException(responseBody, new RuntimeException(response.message()));
+        }
+        return objectMapper.readValue(responseBody, resultClass);
+    }
+
+    public Object doPost(String url, Object param, Class<? extends Object> resultClass) throws IOException {
+        OkHttpClient client = new OkHttpClient();
+        MediaType mediaType = MediaType.parse("application/json");
+        String strBody = objectMapper.writeValueAsString(param);
+        RequestBody body = RequestBody.create(mediaType, strBody);
+        Request request = new Request.Builder()
+            .url(url)
+            .post(body)
+            .addHeader("accept", "application/json")
+            .addHeader("content-type", "application/json")
+            .addHeader("authorization", "Bearer " + baseToken.getAccess_token())
+            .build();
+        Response response = client.newCall(request).execute();
+        String responseBody = response.body().string();
+        if (response.code() != 200) {
+            throw new RuntimeException(responseBody, new RuntimeException(response.message()));
+        }
+        return objectMapper.readValue(responseBody, resultClass);
+    }
+
+    // Base Info
+
+    // https://api.seatable.io/reference/get-metadata
+    public Metadata getMetadata() throws IOException {
+        String url = "https://cloud.seatable.io/dtable-server/api/v1/dtables/" + baseToken.getDtable_uuid() + "/metadata/";
+        return (Metadata) doGet(url, Metadata.class);
+    }
+
+    // Rows
+
+    // https://api.seatable.io/reference/list-rows
+    public ListRowsResult listRows(ListRowsParam param) throws IOException {
+        String url = "https://cloud.seatable.io/dtable-server/api/v1/dtables/" + baseToken.getDtable_uuid() + "/rows/" + param.getUrlParams();
+        return (ListRowsResult) doGet(url, ListRowsResult.class);
     }
 
     // https://api.seatable.io/reference/add-row
     public AddRowResult addRow(AddRowParam param) throws IOException {
-        OkHttpClient client = new OkHttpClient();
-        MediaType mediaType = MediaType.parse("application/json");
-        ObjectMapper objectMapper = new ObjectMapper();
-        String strBody = objectMapper.writeValueAsString(param);
-        RequestBody body = RequestBody.create(mediaType, strBody);
-        Request request = new Request.Builder()
-            .url("https://cloud.seatable.io/dtable-server/api/v1/dtables/" + baseToken.getDtable_uuid() + "/rows/")
-            .post(body)
-            .addHeader("accept", "application/json")
-            .addHeader("content-type", "application/json")
-            .addHeader("authorization", "Bearer " + baseToken.getAccess_token())
-            .build();
-        Response response = client.newCall(request).execute();
-        if (response.code() != 200) {
-            throw new RuntimeException(response.message());
-        }
-        String responseBody = response.body().string();
-        return objectMapper.readValue(responseBody, AddRowResult.class);
+        String url = "https://cloud.seatable.io/dtable-server/api/v1/dtables/" + baseToken.getDtable_uuid() + "/rows/";
+        return (AddRowResult) doPost(url, param, AddRowResult.class);
     }
 
     // https://api.seatable.io/reference/append-rows
     public AppendRowsResult appendRows(AppendRowsParam param) throws IOException {
-        OkHttpClient client = new OkHttpClient();
-        MediaType mediaType = MediaType.parse("application/json");
-        ObjectMapper objectMapper = new ObjectMapper();
-        String strBody = objectMapper.writeValueAsString(param);
-        RequestBody body = RequestBody.create(mediaType, strBody);
-        Request request = new Request.Builder()
-            .url("https://cloud.seatable.io/dtable-server/api/v1/dtables/" + baseToken.getDtable_uuid() + "/batch-append-rows/")
-            .post(body)
-            .addHeader("accept", "application/json")
-            .addHeader("content-type", "application/json")
-            .addHeader("authorization", "Bearer " + baseToken.getAccess_token())
-            .build();
-        Response response = client.newCall(request).execute();
-        if (response.code() != 200) {
-            throw new RuntimeException(response.message());
-        }
-        String responseBody = response.body().string();
-        return objectMapper.readValue(responseBody, AppendRowsResult.class);
+        String url = "https://cloud.seatable.io/dtable-server/api/v1/dtables/" + baseToken.getDtable_uuid() + "/batch-append-rows/";
+        return (AppendRowsResult) doPost(url, param, AppendRowsResult.class);
     }
 
     // https://api.seatable.io/reference/delete-rows
     public DeleteRowsResult deleteRows(DeleteRowsParam param) throws IOException {
-        OkHttpClient client = new OkHttpClient();
-        MediaType mediaType = MediaType.parse("application/json");
-        ObjectMapper objectMapper = new ObjectMapper();
-        String strBody = objectMapper.writeValueAsString(param);
-        RequestBody body = RequestBody.create(mediaType, strBody);
-        Request request = new Request.Builder()
-            .url("https://cloud.seatable.io/dtable-server/api/v1/dtables/" + baseToken.getDtable_uuid() + "/batch-delete-rows/")
-            .delete(body)
-            .addHeader("accept", "application/json")
-            .addHeader("content-type", "application/json")
-            .addHeader("authorization", "Bearer " + baseToken.getAccess_token())
-            .build();
-        Response response = client.newCall(request).execute();
-        if (response.code() != 200) {
-            throw new RuntimeException(response.message());
-        }
-        String responseBody = response.body().string();
-        return objectMapper.readValue(responseBody, DeleteRowsResult.class);
+        String url = "https://cloud.seatable.io/dtable-server/api/v1/dtables/" + baseToken.getDtable_uuid() + "/batch-delete-rows/";
+        return (DeleteRowsResult) doDelete(url, param, DeleteRowsResult.class);
     }
 
     // Links
 
     // https://api.seatable.io/reference/create-row-link
     public CreateRowLinkResult createRowLink(CreateRowLinkParam param) throws IOException {
-        OkHttpClient client = new OkHttpClient();
-        MediaType mediaType = MediaType.parse("application/json");
-        ObjectMapper objectMapper = new ObjectMapper();
-        String strBody = objectMapper.writeValueAsString(param);
-        RequestBody body = RequestBody.create(mediaType, strBody);
-        Request request = new Request.Builder()
-            .url("https://cloud.seatable.io/dtable-server/api/v1/dtables/" + baseToken.getDtable_uuid() + "/links/")
-            .post(body)
-            .addHeader("accept", "application/json")
-            .addHeader("content-type", "application/json")
-            .addHeader("authorization", "Bearer " + baseToken.getAccess_token())
-            .build();
-        Response response = client.newCall(request).execute();
-        if (response.code() != 200) {
-            throw new RuntimeException(response.message());
-        }
-        String responseBody = response.body().string();
-        return objectMapper.readValue(responseBody, CreateRowLinkResult.class);
+        String url = "https://cloud.seatable.io/dtable-server/api/v1/dtables/" + baseToken.getDtable_uuid() + "/links/";
+        return (CreateRowLinkResult) doPost(url, param, CreateRowLinkResult.class);
     }
 
     // Tables
@@ -189,24 +168,8 @@ public class SeaTableApi {
     private CreateNewTableResult createNewTable_NAO_FUNCIONA_100_PORCENTO(CreateNewTableParam param) throws IOException {
         // Está de acordo com a documentação, mas não funciona (nem usando a interface web do site deles).
         // Exemplos: 1. criar campos do tipo número com column_data preenchido; 2. criar colunas do tipo link (que exigem o column_data preenchido).
-        OkHttpClient client = new OkHttpClient();
-        MediaType mediaType = MediaType.parse("application/json");
-        ObjectMapper objectMapper = new ObjectMapper();
-        String strBody = objectMapper.writeValueAsString(param);
-        RequestBody body = RequestBody.create(mediaType, strBody);
-        Request request = new Request.Builder()
-            .url("https://cloud.seatable.io/dtable-server/api/v1/dtables/" + baseToken.getDtable_uuid() + "/tables/")
-            .post(body)
-            .addHeader("accept", "application/json")
-            .addHeader("content-type", "application/json")
-            .addHeader("authorization", "Bearer " + baseToken.getAccess_token())
-            .build();
-        Response response = client.newCall(request).execute();
-        if (response.code() != 200) {
-            throw new RuntimeException(response.message());
-        }
-        String responseBody = response.body().string();
-        return objectMapper.readValue(responseBody, CreateNewTableResult.class);
+        String url = "https://cloud.seatable.io/dtable-server/api/v1/dtables/" + baseToken.getDtable_uuid() + "/tables/";
+        return (CreateNewTableResult) doPost(url, param, CreateNewTableResult.class);
     }
     public CreateNewTableResult createNewTable(CreateNewTableParam param) throws IOException {
         // Gambiarra necessária porque o SeaTable não funciona em certos casos. Ver comentário em createNewTable_NAO_FUNCIONA_100_PORCENTO.
@@ -246,47 +209,15 @@ public class SeaTableApi {
 
     // https://api.seatable.io/reference/delete-table
     public DeleteTableResult deleteTable(DeleteTableParam param) throws IOException {
-        OkHttpClient client = new OkHttpClient();
-        MediaType mediaType = MediaType.parse("application/json");
-        ObjectMapper objectMapper = new ObjectMapper();
-        String strBody = objectMapper.writeValueAsString(param);
-        RequestBody body = RequestBody.create(mediaType, strBody);
-        Request request = new Request.Builder()
-            .url("https://cloud.seatable.io/dtable-server/api/v1/dtables/" + baseToken.getDtable_uuid() + "/tables/")
-            .delete(body)
-            .addHeader("accept", "application/json")
-            .addHeader("content-type", "application/json")
-            .addHeader("authorization", "Bearer " + baseToken.getAccess_token())
-            .build();
-        Response response = client.newCall(request).execute();
-        if (response.code() != 200) {
-            throw new RuntimeException(response.message());
-        }
-        String responseBody = response.body().string();
-        return objectMapper.readValue(responseBody, DeleteTableResult.class);
+        String url = "https://cloud.seatable.io/dtable-server/api/v1/dtables/" + baseToken.getDtable_uuid() + "/tables/";
+        return (DeleteTableResult) doDelete(url, param, DeleteTableResult.class);
     }
 
     // Columns
 
     // https://api.seatable.io/reference/insert-column
     private InsertColumnResult insertColumn(InsertColumnParam param) throws IOException {
-        OkHttpClient client = new OkHttpClient();
-        MediaType mediaType = MediaType.parse("application/json");
-        ObjectMapper objectMapper = new ObjectMapper();
-        String strBody = objectMapper.writeValueAsString(param);
-        RequestBody body = RequestBody.create(mediaType, strBody);
-        Request request = new Request.Builder()
-            .url("https://cloud.seatable.io/dtable-server/api/v1/dtables/" + baseToken.getDtable_uuid() + "/columns/")
-            .post(body)
-            .addHeader("accept", "application/json")
-            .addHeader("content-type", "application/json")
-            .addHeader("authorization", "Bearer " + baseToken.getAccess_token())
-            .build();
-        Response response = client.newCall(request).execute();
-        if (response.code() != 200) {
-            throw new RuntimeException(response.message());
-        }
-        String responseBody = response.body().string();
-        return objectMapper.readValue(responseBody, InsertColumnResult.class);
+        String url = "https://cloud.seatable.io/dtable-server/api/v1/dtables/" + baseToken.getDtable_uuid() + "/columns/";
+        return (InsertColumnResult) doPost(url, param, InsertColumnResult.class);
     }
 }
