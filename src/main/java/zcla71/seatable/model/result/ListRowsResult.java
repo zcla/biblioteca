@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import zcla71.seatable.model.metadata.Row;
 
-public class ListRowsResult {
+public class ListRowsResult implements Result {
     private Collection<Row> rows;
 
     public Collection<Row> getRows() {

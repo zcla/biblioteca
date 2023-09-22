@@ -3,15 +3,15 @@ package zcla71.biblioteca.model;
 import java.util.Collection;
 
 public class Livro {
-    private Integer id;
+    private String id;
     private String nome;
-    private Collection<Autor> autores;
+    private Collection<String> idsAutores;
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -23,11 +23,11 @@ public class Livro {
         this.nome = nome;
     }
 
-    public Collection<Autor> getAutores() {
-        return autores;
+    public Collection<String> getIdsAutores() {
+        return idsAutores;
     }
 
-    public void setAutores(Collection<Autor> autores) {
-        this.autores = autores;
+    public void setIdsAutores(Collection<String> idsAutores) {
+        this.idsAutores = idsAutores;
     }
 }

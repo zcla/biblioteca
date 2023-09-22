@@ -1,6 +1,6 @@
 package zcla71.seatable.model.result;
 
-public class CreateRowLinkResult {
+public class CreateRowLinkResult implements Result {
     private Boolean success;
 
     public Boolean getSuccess() {

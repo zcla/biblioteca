@@ -174,17 +174,20 @@ public class SeaTableApi {
     public CreateNewTableResult createNewTable(CreateNewTableParam param) throws IOException {
         // Gambiarra necessária porque o SeaTable não funciona em certos casos. Ver comentário em createNewTable_NAO_FUNCIONA_100_PORCENTO.
 
-        // Cria a tabela com uma coluna dummy. Nota: o SeaTable não permite que ela seja removida depois.
-        CreateNewTableParam paramDummy = new CreateNewTableParam();
-        paramDummy.setTable_name(param.getTable_name());
-        paramDummy.setColumns(new ArrayList<>());
-        ColumnDef columnDefDummy = new ColumnDefNumber();
-        columnDefDummy.setColumn_name("dummy");
-        paramDummy.getColumns().add(columnDefDummy);
-        CreateNewTableResult result = this.createNewTable_NAO_FUNCIONA_100_PORCENTO(paramDummy);
+
+        // Cria a tabela só com a primeira coluna, porque o SeaTable exige.
+        CreateNewTableParam paramFirst = new CreateNewTableParam();
+        paramFirst.setTable_name(param.getTable_name());
+        paramFirst.setColumns(new ArrayList<>());
+        ColumnDef columnDefFirst = param.getColumns().iterator().next();
+        paramFirst.getColumns().add(columnDefFirst);
+        CreateNewTableResult result = this.createNewTable_NAO_FUNCIONA_100_PORCENTO(paramFirst);
 
         // Cria as outras colunas.
         for (ColumnDef columnDef : param.getColumns()) {
+            if (columnDef == columnDefFirst) {
+                continue;
+            }
             InsertColumnParam icParam = new InsertColumnParam();
             icParam.setTable_name(param.getTable_name());
             icParam.setColumn_type(columnDef.getColumn_type());

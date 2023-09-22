@@ -1,22 +1,15 @@
 package zcla71.biblioteca.model.config;
 
-public class Config {
-    private LibibConfig libib;
-    private SeaTableConfig seaTable;
+import zcla71.dao.config.SeaTableBase;
 
-    public LibibConfig getLibib() {
-        return libib;
+public class Config { // TODO Tá no lugar errado. É do pacote biblioteca.
+    private SeaTableBase biblioteca;
+
+    public SeaTableBase getBiblioteca() {
+        return biblioteca;
     }
 
-    public void setLibib(LibibConfig libib) {
-        this.libib = libib;
-    }
-
-    public SeaTableConfig getSeaTable() {
-        return seaTable;
-    }
-
-    public void setSeaTable(SeaTableConfig seaTable) {
-        this.seaTable = seaTable;
+    public void setBiblioteca(SeaTableBase biblioteca) {
+        this.biblioteca = biblioteca;
     }
 }

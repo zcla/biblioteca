@@ -21,4 +21,12 @@ public class AddRowParam {
     public void setTable_name(String table_name) {
         this.table_name = table_name;
     }
+
+    public AddRowParam() {
+    }
+
+    public AddRowParam(String table_name, Row row) {
+        this.table_name = table_name;
+        this.row = row;
+    }
 }

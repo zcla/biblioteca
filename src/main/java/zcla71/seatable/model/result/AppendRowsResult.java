@@ -1,6 +1,6 @@
 package zcla71.seatable.model.result;
 
-public class AppendRowsResult {
+public class AppendRowsResult implements Result {
     private Integer inserted_row_count;
 
     public Integer getInserted_row_count() {

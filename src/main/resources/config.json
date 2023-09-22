@@ -3,51 +3,46 @@
         "csvFileLocation": "classpath:libib/library.csv"
     },
     "seaTable": {
-        "biblioteca": {
-            "tables": [
-                {
-                    "table_name": "autor",
-                    "columns": [
-                        {
-                            "column_name": "id",
-                            "column_type": "number",
-                            "column_data": {
-                                "format": "number",
-                                "thousands": "no"
+        "bases": [
+            {
+                "base_name": "biblioteca",
+                "tables": [
+                    {
+                        "table_name": "autor",
+                        "columns": [
+                            {
+                                "column_name": "id",
+                                "column_type": "text"
+                            },
+                            {
+                                "column_name": "nome",
+                                "column_type": "text"
                             }
-                        },
-                        {
-                            "column_name": "nome",
-                            "column_type": "text"
-                        }
-                    ]
-                },
-                {
-                    "table_name": "livro",
-                    "columns": [
-                        {
-                            "column_name": "id",
-                            "column_type": "number",
-                            "column_data": {
-                                "format": "number",
-                                "thousands": "no"
+                        ]
+                    },
+                    {
+                        "table_name": "livro",
+                        "columns": [
+                            {
+                                "column_name": "id",
+                                "column_type": "text"
+                            },
+                            {
+                                "column_name": "nome",
+                                "column_type": "text"
+                            },
+                            {
+                                "column_name": "autores",
+                                "column_type": "link",
+                                "column_data": {
+                                    "table": "livro",
+                                    "other_table": "autor"
+                                }
                             }
-                        },
-                        {
-                            "column_name": "nome",
-                            "column_type": "text"
-                        },
-                        {
-                            "column_name": "autores",
-                            "column_type": "link",
-                            "column_data": {
-                                "table": "livro",
-                                "other_table": "autor"
-                            }
-                        }
-                    ]
-                }
-            ]
-        }
+                        ]
+                    }
+                ]
+            }
+        ]
     }
 }

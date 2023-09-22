@@ -1,19 +1,19 @@
-package zcla71.biblioteca.model.config;
+package zcla71.dao.config;
 
 import java.util.Collection;
 
 import zcla71.seatable.model.ddl.TableDef;
 
 public class SeaTableBase {
-    private String name;
+    private String base_name;
     private Collection<TableDef> tables;
 
-    public String getName() {
-        return name;
+    public String getBase_name() {
+        return base_name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setBase_name(String base_name) {
+        this.base_name = base_name;
     }
 
     public Collection<TableDef> getTables() {
