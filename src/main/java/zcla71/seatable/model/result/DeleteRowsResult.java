@@ -1,13 +1,11 @@
 package zcla71.seatable.model.result;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@NoArgsConstructor
 public class DeleteRowsResult implements Result {
+    @Getter @Setter
     private Integer deleted_rows;
-
-    public Integer getDeleted_rows() {
-        return deleted_rows;
-    }
-
-    public void setDeleted_rows(Integer deleted_rows) {
-        this.deleted_rows = deleted_rows;
-    }
 }

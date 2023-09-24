@@ -16,6 +16,7 @@ import zcla71.dao.seatable.transaction.TransactionException;
 import zcla71.dao.seatable.transaction.TransactionExecutionData;
 import zcla71.dao.seatable.transaction.TransactionOperation;
 import zcla71.dao.seatable.transaction.TransactionOperationAddRow;
+import zcla71.dao.seatable.transaction.TransactionOperationAppendRows;
 import zcla71.dao.seatable.transaction.TransactionOperationCreateRowLink;
 import zcla71.seatable.SeaTableApi;
 import zcla71.seatable.model.ddl.ColumnDef;
@@ -25,12 +26,15 @@ import zcla71.seatable.model.metadata.Metadata;
 import zcla71.seatable.model.metadata.Row;
 import zcla71.seatable.model.metadata.Table;
 import zcla71.seatable.model.param.AddRowParam;
+import zcla71.seatable.model.param.AppendRowsParam;
 import zcla71.seatable.model.param.CreateNewTableParam;
 import zcla71.seatable.model.param.CreateRowLinkParam;
+import zcla71.seatable.model.param.CreateRowLinksBatchParam;
 import zcla71.seatable.model.param.DeleteRowsParam;
 import zcla71.seatable.model.param.DeleteTableParam;
 import zcla71.seatable.model.param.ListRowsParam;
 import zcla71.seatable.model.result.CreateNewTableResult;
+import zcla71.seatable.model.result.CreateRowLinksBatchResult;
 import zcla71.seatable.model.result.DeleteRowsResult;
 import zcla71.seatable.model.result.DeleteTableResult;
 import zcla71.seatable.model.result.ListRowsResult;
@@ -41,6 +45,10 @@ public abstract class SeaTableDao {
     public static String getNewId() {
         return UUID.randomUUID().toString();
     }
+
+    // Config
+
+    private final boolean FORCE_ONE_BY_ONE = false;
 
     // Inicialização
     
@@ -149,104 +157,76 @@ public abstract class SeaTableDao {
 
         // Só os que não são CreateRowLink
         Collection<TransactionOperation> nonLink = transaction.stream().filter(t -> ! (t instanceof TransactionOperationCreateRowLink)).toList();
-        for (TransactionOperation op : nonLink) {
-            // TODO Batch
-            op.execute(api);
-            executions.add(new TransactionExecutionData(op));
+        while (nonLink.size() > 0) {
+            TransactionOperation singleOperation = nonLink.iterator().next();
+            TransactionOperation actualOperation = null;
+            Collection<TransactionOperation> resolvedOperations = new ArrayList<>();
+            if (FORCE_ONE_BY_ONE) {
+                actualOperation = singleOperation;
+                resolvedOperations.add(singleOperation);
+            } else {
+                if (singleOperation instanceof TransactionOperationAddRow arOperation) {
+                    resolvedOperations = transaction.stream().filter(t -> (t instanceof TransactionOperationAddRow toar) && (toar.getParam().getTable_name().equals(arOperation.getParam().getTable_name()))).toList();
+                    AppendRowsParam arParam = new AppendRowsParam(new ArrayList<Row>(), arOperation.getParam().getTable_name());
+                    for (TransactionOperation operation : resolvedOperations) {
+                        if (operation instanceof TransactionOperationAddRow aro) { // Sempre true por causa do filter acima
+                            Row row = new Row();
+                            for (String key : aro.getParam().getRow().keySet()) {
+                                row.put(key, aro.getParam().getRow().get(key));
+                            }
+                            arParam.getRows().add(row);
+                        }
+                    }
+                    actualOperation = new TransactionOperationAppendRows(arParam, api);
+                }
+                if (actualOperation == null) {
+                    actualOperation = singleOperation;
+                    resolvedOperations.add(singleOperation);
+                }
+            }
+            actualOperation.execute(api);
+            executions.add(new TransactionExecutionData(actualOperation));
+            final Collection<TransactionOperation> ro = resolvedOperations;
+            nonLink = nonLink.stream().filter(nl -> !ro.contains(nl)).toList();
         }
 
         // "Traduz" de id para _id
+        // TODO Não pode ser assim porque pode haver ids que já estavam no banco.
         Map<String, String> idMap = new HashMap<>();
         for (TransactionExecutionData execution : executions) {
             idMap.putAll(execution.getIds());
         }
 
-        // // Insere dados
-        // boolean forceOneByOne = false;
-
-        // if (forceOneByOne) {
-        //     for (Autor autor : result.getAutores()) {
-        //         AddRowParam param = new AddRowParam();
-        //         param.setTable_name("autor");
-        //         param.setRow(new Row());
-        //         param.getRow().put("id", autor.getId().toString());
-        //         param.getRow().put("nome", autor.getNome());
-        //         @SuppressWarnings("unused")
-        //         AddRowResult irResult = api.addRow(param);
-        //         System.out.println(irResult);
-        //     }
-        // } else {
-        //     AppendRowsParam param = new AppendRowsParam();
-        //     param.setTable_name("autor");
-        //     param.setRows(new ArrayList<>());
-        //     for (Autor autor : result.getAutores()) {
-        //         Row row = new Row();
-        //         row.put("id", autor.getId().toString());
-        //         row.put("nome", autor.getNome());
-        //         param.getRows().add(row);
-        //     }
-        //     @SuppressWarnings("unused")
-        //     AppendRowsResult arResult = api.appendRows(param);
-        // }
-
-        // ListRowsParam lrParam = new ListRowsParam("autor");
-        // ListRowsResult lrResult = api.listRows(lrParam);
-
-        // forceOneByOne = true;
-        // if (forceOneByOne) { // Versão um por um (lenta)
-        //     String link_id = metadata.getMetadata()
-        //             .getTables().stream().filter(t -> t.getName().equals("livro")).findFirst().get()
-        //             .getColumns().stream().filter(c -> c.getName().equals("autores")).findFirst().get()
-        //             .getData().getLink_id();
-        //     for (Livro livro : result.getLivros()) {
-        //         AddRowParam param = new AddRowParam();
-        //         param.setTable_name("livro");
-        //         param.setRow(new Row());
-        //         param.getRow().put("id", livro.getId().toString());
-        //         param.getRow().put("nome", livro.getNome());
-        //         Collection<String> autores = new ArrayList<String>();
-        //         if (livro.getAutores() != null) {
-        //             for (Autor autor : livro.getAutores()) {
-        //                 Row row = lrResult.getRows().stream().filter(a -> a.get("nome").equals(autor.getNome())).findFirst().get();
-        //                 if (row != null) {
-        //                     autores.add((String) row.get("_id"));
-        //                 }
-        //             }
-        //             param.getRow().put("autores", autores);
-        //         }
-        //         AddRowResult irResult = api.addRow(param);
-        //         // Insere os links, que NÃO são inseridos no addRow.
-        //         for (String table_row_id : autores) {
-        //             CreateRowLinkParam crlParam = new CreateRowLinkParam();
-        //             crlParam.setTable_name("livro");
-        //             crlParam.setOther_table_name("autor");
-        //             crlParam.setLink_id(link_id);
-        //             crlParam.setTable_row_id(irResult.get("_id"));
-        //             crlParam.setOther_table_row_id(table_row_id);
-        //             @SuppressWarnings("unused")
-        //             CreateRowLinkResult crlResult = api.createRowLink(crlParam);
-        //         }
-        //     }
-        // } else { // Versão batch
-        // //     AppendRowsParam param = new AppendRowsParam();
-        // //     param.setTable_name("livro");
-        // //     param.setRows(new ArrayList<>());
-        // //     for (Livro livro : result.getLivros()) {
-        // //         Row row = new Row();
-        // //         row.put("id", livro.getId().toString());
-        // //         row.put("nome", livro.getNome());
-        // //         param.getRows().add(row);
-        // //     }
-        // //     @SuppressWarnings("unused")
-        // //     AppendRowsResult arResult = api.appendRows(param);
-        // }
-
         // Só os CreateRowLink
         Collection<TransactionOperation> link = transaction.stream().filter(t -> (t instanceof TransactionOperationCreateRowLink)).toList();
-        for (TransactionOperation op : link) {
-            // TODO Batch
-            op.applyIdMap(idMap);
-            op.execute(api);
+        
+        while (link.size() > 0) {
+            TransactionOperation op = link.iterator().next();
+            if (FORCE_ONE_BY_ONE) {
+                op.applyIdMap(idMap);
+                op.execute(api);
+                link = link.stream().filter(l -> !(l.equals(op))).toList();
+            } else {
+                if (op instanceof TransactionOperationCreateRowLink tocrl) { // Sempre true por causa do filter acima
+                    String table_id = metadata.getMetadata().getTables().stream().filter(t -> t.getName().equals(tocrl.getParam().getTable_name())).findFirst().get().get_id();
+                    String other_table_id = metadata.getMetadata().getTables().stream().filter(t -> t.getName().equals(tocrl.getParam().getOther_table_name())).findFirst().get().get_id();
+                    String link_id = tocrl.getParam().getLink_id();
+                    Collection<String> row_id_list = new ArrayList<>();
+                    Map<String, Collection<String>> other_rows_ids_map = new HashMap<>();
+                    for (TransactionOperation operation : link) {
+                        if (operation instanceof TransactionOperationCreateRowLink tocrl2) { // Sempre true por causa do filter acima
+                            row_id_list.add(idMap.get(tocrl2.getParam().getTable_row_id()));
+                            Collection<String> param2 = new ArrayList<>();
+                            param2.add(idMap.get(tocrl2.getParam().getOther_table_row_id()));
+                            other_rows_ids_map.put(idMap.get(tocrl2.getParam().getTable_row_id()), param2);
+                        }
+                    }
+                    CreateRowLinksBatchParam crlbParam = new CreateRowLinksBatchParam(table_id, other_table_id, link_id, row_id_list, other_rows_ids_map);
+                    @SuppressWarnings("unused")
+                    CreateRowLinksBatchResult crlbResult = api.createRowLinksBatch(crlbParam);
+                    link = new ArrayList<TransactionOperation>();
+                }
+            }
         }
 
         // Fim

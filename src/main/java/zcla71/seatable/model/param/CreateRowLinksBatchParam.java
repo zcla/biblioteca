@@ -1,5 +1,8 @@
 package zcla71.seatable.model.param;
 
+import java.util.Collection;
+import java.util.Map;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,15 +10,15 @@ import lombok.Setter;
 
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateRowLinkParam {
+public class CreateRowLinksBatchParam {
     @Getter @Setter
-    private String table_name;
+    private String table_id;
     @Getter @Setter
-    private String other_table_name;
+    private String other_table_id;
     @Getter @Setter
     private String link_id;
     @Getter @Setter
-    private String table_row_id;
+    private Collection<String> row_id_list;
     @Getter @Setter
-    private String other_table_row_id;
+    private Map<String, Collection<String>> other_rows_ids_map;
 }

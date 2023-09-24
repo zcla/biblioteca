@@ -2,6 +2,8 @@ package zcla71.seatable.model.param;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import lombok.Getter;
+import lombok.Setter;
 import zcla71.utils.Utils;
 
 public class ListRowsParam {
@@ -9,69 +11,20 @@ public class ListRowsParam {
         asc, desc
     };
 
+    @Getter @Setter
     private String table_name;
+    @Getter @Setter
     private String view_name;
+    @Getter @Setter
     private Boolean convert_link_id;
+    @Getter @Setter
     private String order_by;
+    @Getter @Setter
     private Direction direction;
+    @Getter @Setter
     private Integer start;
+    @Getter @Setter
     private Integer limit;
-
-    public String getTable_name() {
-        return table_name;
-    }
-
-    public void setTable_name(String table_name) {
-        this.table_name = table_name;
-    }
-
-    public String getView_name() {
-        return view_name;
-    }
-
-    public void setView_name(String view_name) {
-        this.view_name = view_name;
-    }
-
-    public Boolean getConvert_link_id() {
-        return convert_link_id;
-    }
-
-    public void setConvert_link_id(Boolean convert_link_id) {
-        this.convert_link_id = convert_link_id;
-    }
-
-    public String getOrder_by() {
-        return order_by;
-    }
-
-    public void setOrder_by(String order_by) {
-        this.order_by = order_by;
-    }
-
-    public Direction getDirection() {
-        return direction;
-    }
-
-    public void setDirection(Direction direction) {
-        this.direction = direction;
-    }
-
-    public Integer getStart() {
-        return start;
-    }
-
-    public void setStart(Integer start) {
-        this.start = start;
-    }
-
-    public Integer getLimit() {
-        return limit;
-    }
-
-    public void setLimit(Integer limit) {
-        this.limit = limit;
-    }
 
     public ListRowsParam(String table_name) {
         this.table_name = table_name;

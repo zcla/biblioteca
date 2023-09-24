@@ -2,15 +2,12 @@ package zcla71.seatable.model.param;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
-import zcla71.seatable.model.metadata.Row;
 
-@NoArgsConstructor
 @AllArgsConstructor
-public class AddRowParam {
+public class ListRowsSqlParam {
     @Getter @Setter
-    private Row row;
+    private String sql;
     @Getter @Setter
-    private String table_name;
+    private Boolean convert_keys;
 }

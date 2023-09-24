@@ -8,7 +8,7 @@ import zcla71.seatable.SeaTableApi;
 public abstract class TransactionOperation {
     public abstract void execute(SeaTableApi api) throws IOException;
 
-    public abstract Map<String, String> getIdMap();
+    public abstract Map<String, String> getIdMap(); // TODO Nem todos precisam; provavelmente isso é uma implementação ruim.
 
-    public abstract void applyIdMap(Map<String, String> idMap);
+    public abstract void applyIdMap(Map<String, String> idMap); // TODO Nem todos precisam; provavelmente isso é uma implementação ruim.
 }

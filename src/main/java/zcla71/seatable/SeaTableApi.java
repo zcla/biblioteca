@@ -18,19 +18,23 @@ import zcla71.seatable.model.metadata.Metadata;
 import zcla71.seatable.model.param.AppendRowsParam;
 import zcla71.seatable.model.param.CreateNewTableParam;
 import zcla71.seatable.model.param.CreateRowLinkParam;
+import zcla71.seatable.model.param.CreateRowLinksBatchParam;
 import zcla71.seatable.model.param.DeleteRowsParam;
 import zcla71.seatable.model.param.AddRowParam;
 import zcla71.seatable.model.param.DeleteTableParam;
 import zcla71.seatable.model.param.InsertColumnParam;
 import zcla71.seatable.model.param.InsertColumnParamData;
 import zcla71.seatable.model.param.ListRowsParam;
+import zcla71.seatable.model.param.ListRowsSqlParam;
 import zcla71.seatable.model.result.AppendRowsResult;
 import zcla71.seatable.model.result.CreateNewTableResult;
 import zcla71.seatable.model.result.CreateRowLinkResult;
+import zcla71.seatable.model.result.CreateRowLinksBatchResult;
 import zcla71.seatable.model.result.DeleteRowsResult;
 import zcla71.seatable.model.result.DeleteTableResult;
 import zcla71.seatable.model.result.InsertColumnResult;
 import zcla71.seatable.model.result.ListRowsResult;
+import zcla71.seatable.model.result.ListRowsSqlResult;
 import zcla71.seatable.model.result.AddRowResult;
 
 // https://api.seatable.io/reference
@@ -120,6 +124,26 @@ public class SeaTableApi {
         return objectMapper.readValue(responseBody, resultClass);
     }
 
+    public Object doPut(String url, Object param, Class<? extends Object> resultClass) throws IOException {
+        OkHttpClient client = new OkHttpClient();
+        MediaType mediaType = MediaType.parse("application/json");
+        String strBody = objectMapper.writeValueAsString(param);
+        RequestBody body = RequestBody.create(mediaType, strBody);
+        Request request = new Request.Builder()
+            .url(url)
+            .put(body)
+            .addHeader("accept", "application/json")
+            .addHeader("content-type", "application/json")
+            .addHeader("authorization", "Bearer " + baseToken.getAccess_token())
+            .build();
+        Response response = client.newCall(request).execute();
+        String responseBody = response.body().string();
+        if (response.code() != 200) {
+            throw new RuntimeException(responseBody, new RuntimeException(response.message()));
+        }
+        return objectMapper.readValue(responseBody, resultClass);
+    }
+
     // Base Info
 
     // https://api.seatable.io/reference/get-metadata
@@ -134,6 +158,12 @@ public class SeaTableApi {
     public ListRowsResult listRows(ListRowsParam param) throws IOException {
         String url = "https://cloud.seatable.io/dtable-server/api/v1/dtables/" + baseToken.getDtable_uuid() + "/rows/" + param.getUrlParams();
         return (ListRowsResult) doGet(url, ListRowsResult.class);
+    }
+
+    // https://api.seatable.io/reference/list-rows-with-sql
+    public ListRowsSqlResult listRowsSql(ListRowsSqlParam param) throws IOException {
+        String url = "https://cloud.seatable.io/dtable-db/api/v1/query/" + baseToken.getDtable_uuid() + "/";
+        return (ListRowsSqlResult) doPost(url, param, ListRowsSqlResult.class);
     }
 
     // https://api.seatable.io/reference/add-row
@@ -160,6 +190,12 @@ public class SeaTableApi {
     public CreateRowLinkResult createRowLink(CreateRowLinkParam param) throws IOException {
         String url = "https://cloud.seatable.io/dtable-server/api/v1/dtables/" + baseToken.getDtable_uuid() + "/links/";
         return (CreateRowLinkResult) doPost(url, param, CreateRowLinkResult.class);
+    }
+
+    // https://api.seatable.io/reference/put_dtable-server-api-v1-dtables-base-uuid-batch-update-links
+    public CreateRowLinksBatchResult createRowLinksBatch(CreateRowLinksBatchParam param) throws IOException {
+        String url = "https://cloud.seatable.io/dtable-server/api/v1/dtables/" + baseToken.getDtable_uuid() + "/batch-update-links/";
+        return (CreateRowLinksBatchResult) doPut(url, param, CreateRowLinksBatchResult.class);
     }
 
     // Tables

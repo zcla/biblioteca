@@ -2,12 +2,16 @@ package zcla71.seatable.model.param;
 
 import zcla71.seatable.model.metadata.Table;
 
-public class DeleteTableParam {
-    private String table_name;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-    public String getTable_name() {
-        return table_name;
-    }
+@NoArgsConstructor
+@AllArgsConstructor
+public class DeleteTableParam {
+    @Getter @Setter
+    private String table_name;
 
     public DeleteTableParam(Table table) {
         this.table_name = table.getName();

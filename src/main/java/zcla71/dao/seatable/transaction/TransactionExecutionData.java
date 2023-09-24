@@ -4,10 +4,14 @@ import java.util.Map;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@NoArgsConstructor
 @AllArgsConstructor
 public class TransactionExecutionData {
-    @Getter private TransactionOperation operation;
+    @Getter @Setter
+    private TransactionOperation operation;
 
     public Map<String, String> getIds() {
         return operation.getIdMap();

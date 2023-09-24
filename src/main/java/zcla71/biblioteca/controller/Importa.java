@@ -272,7 +272,6 @@ public class Importa {
 
         dao.startTransaction();
         try {
-
             for (LibibLivro libibLivro : libibLivros) {
                 Livro livro = new Livro();
 
@@ -308,11 +307,11 @@ public class Importa {
                             result.getAutores().add(autor);
 
                             dao.addRow(new AddRowParam(
-                                "autor",
                                 new Row(new Object[][] {
                                     { "id", autor.getId() },
                                     { "nome", autor.getNome() }
-                                })
+                                }),
+                                "autor"
                             ));
                         }
                         livro.getIdsAutores().add(autor.getId());
@@ -321,16 +320,17 @@ public class Importa {
 
                 result.getLivros().add(livro);
 
+                Row row = new Row(new Object[][] {
+                    { "id", livro.getId() },
+                    { "nome", livro.getNome() }
+                });
                 if (livro.getIdsAutores() != null) {
-                    dao.addRow(new AddRowParam(
-                        "livro",
-                        new Row(new Object[][] {
-                            { "id", livro.getId() },
-                            { "nome", livro.getNome() },
-                            { "autores", livro.getIdsAutores() }
-                        })
-                    ));
+                    row.put("autores", livro.getIdsAutores());
                 }
+                dao.addRow(new AddRowParam(
+                    row,
+                    "livro"
+                ));
             }
 
             dao.commitTransaction();

@@ -4,13 +4,18 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import zcla71.seatable.SeaTableApi;
 import zcla71.seatable.model.param.CreateRowLinkParam;
 import zcla71.seatable.model.result.CreateRowLinkResult;
 
+@NoArgsConstructor
 public class TransactionOperationCreateRowLink extends TransactionOperation {
+    @Getter @Setter
     private CreateRowLinkParam param;
-    @SuppressWarnings("unused")
+    @Getter
     private CreateRowLinkResult result;
 
     public TransactionOperationCreateRowLink(CreateRowLinkParam param) {
