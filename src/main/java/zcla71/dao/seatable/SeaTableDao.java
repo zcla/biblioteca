@@ -21,6 +21,7 @@ import zcla71.dao.seatable.transaction.TransactionOperationAppendRows;
 import zcla71.dao.seatable.transaction.TransactionOperationCreateRowLink;
 import zcla71.seatable.SeaTableApi;
 import zcla71.seatable.model.ddl.ColumnDef;
+import zcla71.seatable.model.ddl.ColumnDefNumber;
 import zcla71.seatable.model.ddl.TableDef;
 import zcla71.seatable.model.metadata.Column;
 import zcla71.seatable.model.metadata.Metadata;
@@ -33,11 +34,13 @@ import zcla71.seatable.model.param.CreateRowLinkParam;
 import zcla71.seatable.model.param.CreateRowLinksBatchParam;
 import zcla71.seatable.model.param.DeleteRowsParam;
 import zcla71.seatable.model.param.DeleteTableParam;
+import zcla71.seatable.model.param.InsertColumnParam;
 import zcla71.seatable.model.param.ListRowsParam;
 import zcla71.seatable.model.result.CreateNewTableResult;
 import zcla71.seatable.model.result.CreateRowLinksBatchResult;
 import zcla71.seatable.model.result.DeleteRowsResult;
 import zcla71.seatable.model.result.DeleteTableResult;
+import zcla71.seatable.model.result.InsertColumnResult;
 import zcla71.seatable.model.result.ListRowsResult;
 
 public abstract class SeaTableDao {
@@ -70,48 +73,107 @@ public abstract class SeaTableDao {
         for (SeaTableBase base : config.getBases()) {
             boolean reloadMetadata = false;
 
-            // Cria as tabelas que não existem
-            for (TableDef tableDef : base.getTables()) {
-                try {
-                    @SuppressWarnings("unused")
-                    Table table = metadata.getMetadata().getTables().stream()
-                        .filter(t -> t.getName().equals(tableDef.getTable_name()))
-                        .findFirst()
-                        .get();
-                } catch (NoSuchElementException e) {
-                    // Verifica se a primeira coluna é "number id"
-                    ColumnDef id = tableDef.getColumns().iterator().next();
-                    if (!id.getColumn_name().equals("id")) {
-                        throw new SeaTableDaoException("A primeira coluna da tabela deve se chamar \"id\".");
-                    }
-                    if (!id.getColumn_type().equals("text")) {
-                        throw new SeaTableDaoException("A primeira coluna da tabela deve ser do tipo \"text\".");
-                    }
+            // Remove todas as tabelas para que sejam recriadas
+            String dummyTableName = null;
+            if (base.getOptions().getStartup().getRecreateExistingTables()) {
+                // Cria uma tabela dummy porque o SeaTable não permite que uma base não tenha nenhuma tabela
+                dummyTableName = "dummy_" + getNewId();
+                CreateNewTableParam cntParam = new CreateNewTableParam();
+                cntParam.setTable_name(dummyTableName);
+                Collection<ColumnDef> columns = new ArrayList<>();
+                ColumnDef columnDef = new ColumnDefNumber();
+                columnDef.setColumn_name("id");
+                columns.add(columnDef);
+                cntParam.setColumns(columns);
+                @SuppressWarnings("unused")
+                CreateNewTableResult ctpResult = api.createNewTable(cntParam);
 
-                    // Cria a tabela
-                    CreateNewTableParam cntParam = new CreateNewTableParam();
-                    cntParam.setTable_name(tableDef.getTable_name());
-                    cntParam.setColumns(tableDef.getColumns());
+                // Remove todas as outras tabelas
+                for (Table table : metadata.getMetadata().getTables()) {
+                    DeleteTableParam tableDeleteDef = new DeleteTableParam(table.getName());
                     @SuppressWarnings("unused")
-                    CreateNewTableResult ctpResult = api.createNewTable(cntParam);
-                    reloadMetadata = true;
+                    DeleteTableResult success = api.deleteTable(tableDeleteDef);
+                }
+
+                metadata = api.getMetadata();
+            }
+
+            // Cria as tabelas que não existem
+            if (base.getOptions().getStartup().getCreateMissingTables()) {
+                for (TableDef tableDef : base.getTables()) {
+                    try {
+                        @SuppressWarnings("unused")
+                        Table table = metadata.getMetadata().getTables().stream()
+                            .filter(t -> t.getName().equals(tableDef.getTable_name()))
+                            .findFirst()
+                            .get();
+                    } catch (NoSuchElementException e) {
+                        // Verifica se a primeira coluna é "number id"
+                        ColumnDef id = tableDef.getColumns().iterator().next();
+                        if (!id.getColumn_name().equals("id")) {
+                            throw new SeaTableDaoException("A primeira coluna da tabela deve se chamar \"id\".");
+                        }
+                        if (!id.getColumn_type().equals("text")) {
+                            throw new SeaTableDaoException("A primeira coluna da tabela deve ser do tipo \"text\".");
+                        }
+
+                        // Cria a tabela
+                        CreateNewTableParam cntParam = new CreateNewTableParam();
+                        cntParam.setTable_name(tableDef.getTable_name());
+                        cntParam.setColumns(tableDef.getColumns());
+                        @SuppressWarnings("unused")
+                        CreateNewTableResult ctpResult = api.createNewTable(cntParam);
+                        reloadMetadata = true;
+                    }
+                }
+            }
+            if (reloadMetadata) {
+                metadata = api.getMetadata();
+                reloadMetadata = false;
+            }
+
+            // Cria as colunas que não existem
+            if (base.getOptions().getStartup().getCreateMissingColumns()) {
+                for (TableDef tableDef : base.getTables()) {
+                    for (ColumnDef columnDef : tableDef.getColumns()) {
+                        if (!metadata.getMetadata().getTables()
+                                .stream().filter(t -> t.getName().equals(tableDef.getTable_name())).findFirst().get().getColumns()
+                                .stream().anyMatch(c -> c.getName().equals(columnDef.getColumn_name()))) {
+                            InsertColumnParam icParam = new InsertColumnParam(tableDef.getTable_name(), columnDef);
+                            @SuppressWarnings("unused")
+                            InsertColumnResult icResult = api.insertColumn(icParam);
+                        }
+                    }
+                }
+                reloadMetadata = true;
+            }
+
+            // Exclui tabelas não previstas na configuração
+            if (base.getOptions().getStartup().getRemoveAlienTables()) {
+                for (Table table : metadata.getMetadata().getTables()) {
+                    try {
+                        @SuppressWarnings("unused")
+                        TableDef tableDef = base.getTables().stream()
+                            .filter(t -> t.getTable_name().equals(table.getName()))
+                            .findFirst()
+                            .get();
+                    } catch (NoSuchElementException e) {
+                        if (!table.getName().equals(dummyTableName)) {
+                            DeleteTableParam tableDeleteDef = new DeleteTableParam(table);
+                            @SuppressWarnings("unused")
+                            DeleteTableResult success = api.deleteTable(tableDeleteDef);
+                            reloadMetadata = true;
+                        }
+                    }
                 }
             }
 
-            // Exclui tabelas que não deveriam existir
-            for (Table table : metadata.getMetadata().getTables()) {
-                try {
-                    @SuppressWarnings("unused")
-                    TableDef tableDef = base.getTables().stream()
-                        .filter(t -> t.getTable_name().equals(table.getName()))
-                        .findFirst()
-                        .get();
-                } catch (NoSuchElementException e) {
-                    DeleteTableParam tableDeleteDef = new DeleteTableParam(table);
-                    @SuppressWarnings("unused")
-                    DeleteTableResult success = api.deleteTable(tableDeleteDef);
-                    reloadMetadata = true;
-                }
+            // Exclui a tabela dummy criada em base.getOptions().getStartup().getRecreateExistingTables()
+            if (dummyTableName != null) {
+                DeleteTableParam tableDeleteDef = new DeleteTableParam(dummyTableName);
+                @SuppressWarnings("unused")
+                DeleteTableResult success = api.deleteTable(tableDeleteDef);
+                reloadMetadata = true;
             }
 
             // Atualiza metadata

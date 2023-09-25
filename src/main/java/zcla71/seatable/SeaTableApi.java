@@ -12,8 +12,6 @@ import com.squareup.okhttp.Response;
 
 import zcla71.seatable.model.BaseToken;
 import zcla71.seatable.model.ddl.ColumnDef;
-import zcla71.seatable.model.ddl.ColumnDefLink;
-import zcla71.seatable.model.ddl.ColumnDefNumber;
 import zcla71.seatable.model.metadata.Metadata;
 import zcla71.seatable.model.param.AppendRowsParam;
 import zcla71.seatable.model.param.CreateNewTableParam;
@@ -23,7 +21,6 @@ import zcla71.seatable.model.param.DeleteRowsParam;
 import zcla71.seatable.model.param.AddRowParam;
 import zcla71.seatable.model.param.DeleteTableParam;
 import zcla71.seatable.model.param.InsertColumnParam;
-import zcla71.seatable.model.param.InsertColumnParamData;
 import zcla71.seatable.model.param.ListRowsParam;
 import zcla71.seatable.model.param.ListRowsSqlParam;
 import zcla71.seatable.model.result.AppendRowsResult;
@@ -225,21 +222,7 @@ public class SeaTableApi {
             if (columnDef == columnDefFirst) {
                 continue;
             }
-            InsertColumnParam icParam = new InsertColumnParam();
-            icParam.setTable_name(param.getTable_name());
-            icParam.setColumn_type(columnDef.getColumn_type());
-            icParam.setColumn_name(columnDef.getColumn_name());
-            if (columnDef instanceof ColumnDefNumber cdn && cdn.getColumn_data() != null) {
-                icParam.setColumn_data(new InsertColumnParamData());
-                icParam.getColumn_data().put("format", cdn.getColumn_data().getFormat());
-                icParam.getColumn_data().put("decimal", cdn.getColumn_data().getDecimal());
-                icParam.getColumn_data().put("thousands", cdn.getColumn_data().getThousands());
-            }
-            if (columnDef instanceof ColumnDefLink cdl && cdl.getColumn_data() != null) {
-                icParam.setColumn_data(new InsertColumnParamData());
-                icParam.getColumn_data().put("table", cdl.getColumn_data().getTable());
-                icParam.getColumn_data().put("other_table", cdl.getColumn_data().getOther_table());
-            }
+            InsertColumnParam icParam = new InsertColumnParam(param.getTable_name(), columnDef);
             InsertColumnResult icResult = insertColumn(icParam);
             result.getColumns().add(icResult);
         }
@@ -256,7 +239,7 @@ public class SeaTableApi {
     // Columns
 
     // https://api.seatable.io/reference/insert-column
-    private InsertColumnResult insertColumn(InsertColumnParam param) throws IOException {
+    public InsertColumnResult insertColumn(InsertColumnParam param) throws IOException {
         String url = "https://cloud.seatable.io/dtable-server/api/v1/dtables/" + baseToken.getDtable_uuid() + "/columns/";
         return (InsertColumnResult) doPost(url, param, InsertColumnResult.class);
     }

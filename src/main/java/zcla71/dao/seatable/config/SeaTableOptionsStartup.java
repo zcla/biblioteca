@@ -9,5 +9,13 @@ import lombok.Setter;
 @AllArgsConstructor
 public class SeaTableOptionsStartup {
     @Getter @Setter
+    private Boolean recreateExistingTables;
+    @Getter @Setter
+    private Boolean createMissingTables;
+    @Getter @Setter
+    private Boolean createMissingColumns;
+    @Getter @Setter
+    private Boolean removeAlienTables;
+    @Getter @Setter
     private Boolean eraseData;
 }

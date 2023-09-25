@@ -8,6 +8,10 @@
                 "base_name": "biblioteca",
                 "options": {
                     "startup": {
+                        "recreateExistingTables": false,
+                        "createMissingTables": true,
+                        "createMissingColumns": true,
+                        "removeAlienTables": true,
                         "eraseData": true
                     }
                 },
