@@ -202,36 +202,50 @@ public abstract class SeaTableDao {
         }
 
         // Só os CreateRowLink
-        Collection<TransactionOperation> link = transaction.stream().filter(t -> (t instanceof TransactionOperationCreateRowLink)).toList();
-        
+        Collection<TransactionOperationCreateRowLink> link = transaction.stream().filter(t -> (t instanceof TransactionOperationCreateRowLink)).map(TransactionOperationCreateRowLink.class::cast).toList();
+
         while (link.size() > 0) {
-            TransactionOperation op = link.iterator().next();
-            // if (FORCE_ONE_BY_ONE) {
-                op.applyIdMap(idMap);
-                op.execute(api);
-                link = link.stream().filter(l -> !(l.equals(op))).toList();
-            // TODO Tá fazendo tudo errado. Verificar.
-            // } else {
-            //     if (op instanceof TransactionOperationCreateRowLink tocrl) { // Sempre true por causa do filter acima
-            //         String table_id = metadata.getMetadata().getTables().stream().filter(t -> t.getName().equals(tocrl.getParam().getTable_name())).findFirst().get().get_id();
-            //         String other_table_id = metadata.getMetadata().getTables().stream().filter(t -> t.getName().equals(tocrl.getParam().getOther_table_name())).findFirst().get().get_id();
-            //         String link_id = tocrl.getParam().getLink_id();
-            //         Collection<String> row_id_list = new ArrayList<>();
-            //         Map<String, Collection<String>> other_rows_ids_map = new HashMap<>();
-            //         for (TransactionOperation operation : link) {
-            //             if (operation instanceof TransactionOperationCreateRowLink tocrl2) { // Sempre true por causa do filter acima
-            //                 row_id_list.add(idMap.get(tocrl2.getParam().getTable_row_id()));
-            //                 Collection<String> param2 = new ArrayList<>();
-            //                 param2.add(idMap.get(tocrl2.getParam().getOther_table_row_id()));
-            //                 other_rows_ids_map.put(idMap.get(tocrl2.getParam().getTable_row_id()), param2);
-            //             }
-            //         }
-            //         CreateRowLinksBatchParam crlbParam = new CreateRowLinksBatchParam(table_id, other_table_id, link_id, row_id_list, other_rows_ids_map);
-            //         @SuppressWarnings("unused")
-            //         CreateRowLinksBatchResult crlbResult = api.createRowLinksBatch(crlbParam);
-            //         link = new ArrayList<TransactionOperation>();
-            //     }
-            // }
+            TransactionOperationCreateRowLink tocrl1 = link.iterator().next();
+            Collection<TransactionOperationCreateRowLink> resolvedOperations = new ArrayList<>();
+            if (FORCE_ONE_BY_ONE) {
+                tocrl1.applyIdMap(idMap);
+                tocrl1.execute(api);
+                link = link.stream().filter(l -> !(l.equals(tocrl1))).toList();
+                resolvedOperations.add(tocrl1);
+            } else {
+                String table_id = metadata.getMetadata().getTables().stream().filter(t -> t.getName().equals(tocrl1.getParam().getTable_name())).findFirst().get().get_id();
+                String other_table_id = metadata.getMetadata().getTables().stream().filter(t -> t.getName().equals(tocrl1.getParam().getOther_table_name())).findFirst().get().get_id();
+                String link_id = tocrl1.getParam().getLink_id();
+                Collection<TransactionOperationCreateRowLink> group1 = link.stream().filter(t -> (
+                    t.getParam().getTable_name().equals(tocrl1.getParam().getTable_name()) &&
+                    t.getParam().getOther_table_name().equals(tocrl1.getParam().getOther_table_name()) &&
+                    t.getParam().getLink_id().equals(tocrl1.getParam().getLink_id())
+                )).toList();
+                Collection<String> row_id_list = new ArrayList<>();
+                Map<String, Collection<String>> other_rows_ids_map = new HashMap<>();
+                while (group1.size() > 0) {
+                    TransactionOperationCreateRowLink tocrl2 = group1.iterator().next();
+                    String row_id = idMap.get(tocrl2.getParam().getTable_row_id());
+                    row_id_list.add(row_id);
+                    other_rows_ids_map.put(row_id, new ArrayList<>());
+                    Collection<TransactionOperationCreateRowLink> group2 = group1.stream().filter(t -> (t.getParam().getTable_row_id().equals(tocrl2.getParam().getTable_row_id()))).toList();
+                    while (group2.size() > 0) {
+                        TransactionOperationCreateRowLink tocrl3 = group2.iterator().next();
+                        String other_row_id = idMap.get(tocrl3.getParam().getOther_table_row_id());
+                        other_rows_ids_map.get(row_id).add(other_row_id);
+                        resolvedOperations.add(tocrl3);
+                        final Collection<TransactionOperationCreateRowLink> ro = resolvedOperations;
+                        group2 = group2.stream().filter(nl -> !ro.contains(nl)).toList();
+                    }
+                    final Collection<TransactionOperationCreateRowLink> ro = resolvedOperations;
+                    group1 = group1.stream().filter(nl -> !ro.contains(nl)).toList();
+                }
+                CreateRowLinksBatchParam crlbParam = new CreateRowLinksBatchParam(table_id, other_table_id, link_id, row_id_list, other_rows_ids_map);
+                @SuppressWarnings("unused")
+                CreateRowLinksBatchResult crlbResult = api.createRowLinksBatch(crlbParam);
+            }
+            final Collection<TransactionOperationCreateRowLink> ro = resolvedOperations;
+            link = link.stream().filter(nl -> !ro.contains(nl)).toList();
         }
 
         // Fim
