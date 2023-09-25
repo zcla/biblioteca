@@ -250,15 +250,17 @@ public abstract class SeaTableDao {
             if (column.getType().equals("link")) {
                 @SuppressWarnings("unchecked")
                 Collection<String> other_table_row_ids = (Collection<String>) arParam.getRow().get(column.getName());
-                for (String other_table_row_id : other_table_row_ids) {
-                    CreateRowLinkParam crlParam = new CreateRowLinkParam();
-                    crlParam.setTable_name(table.getName());
-                    String otherTableName = metadata.getMetadata().getTables().stream().filter(t -> t.get_id().equals(column.getData().getOther_table_id())).findFirst().get().getName();
-                    crlParam.setOther_table_name(otherTableName);
-                    crlParam.setLink_id(column.getData().getLink_id());
-                    crlParam.setTable_row_id((String) arParam.getRow().get("id"));
-                    crlParam.setOther_table_row_id(other_table_row_id);
-                    this.transaction.add(new TransactionOperationCreateRowLink(crlParam));
+                if (other_table_row_ids != null) {
+                    for (String other_table_row_id : other_table_row_ids) {
+                        CreateRowLinkParam crlParam = new CreateRowLinkParam();
+                        crlParam.setTable_name(table.getName());
+                        String otherTableName = metadata.getMetadata().getTables().stream().filter(t -> t.get_id().equals(column.getData().getOther_table_id())).findFirst().get().getName();
+                        crlParam.setOther_table_name(otherTableName);
+                        crlParam.setLink_id(column.getData().getLink_id());
+                        crlParam.setTable_row_id((String) arParam.getRow().get("id"));
+                        crlParam.setOther_table_row_id(other_table_row_id);
+                        this.transaction.add(new TransactionOperationCreateRowLink(crlParam));
+                    }
                 }
             }
         }

@@ -38,6 +38,10 @@
                                     "table": "livro",
                                     "other_table": "autor"
                                 }
+                            },
+                            {
+                                "column_name": "isbn13",
+                                "column_type": "text"
                             }
                         ]
                     }

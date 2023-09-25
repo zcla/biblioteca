@@ -79,6 +79,10 @@ public class Importa {
                 }
             }
 
+            // isbn13
+            livro.setIsbn13(libibLivro.getEan_isbn13());
+
+            // fim
             result.getLivros().add(livro);
         }
 
@@ -160,15 +164,17 @@ public class Importa {
                     }
                 }
 
+                // isbn13
+                livro.setIsbn13(libibLivro.getEan_isbn13());
+
                 result.getLivros().add(livro);
 
                 Row row = new Row(new Object[][] {
                     { "id", livro.getId() },
-                    { "nome", livro.getNome() }
+                    { "nome", livro.getNome() },
+                    { "isbn13", livro.getIsbn13()}
                 });
-                if (livro.getIdsAutores() != null) {
-                    row.put("autores", livro.getIdsAutores());
-                }
+                row.put("autores", livro.getIdsAutores());
                 dao.addRow(new AddRowParam(
                     row,
                     "livro"
