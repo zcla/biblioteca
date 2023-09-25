@@ -33,62 +33,6 @@ public class Importa {
         return BibliotecaDao.getInstance().getLibibLivros();
     }
 
-    @PostMapping(value="/libib/importacao-pre")
-    private Importacao importa() throws StreamReadException, DatabindException, IllegalStateException, FileNotFoundException, IOException, SeaTableDaoException {
-        Collection<LibibLivro> libibLivros = libibLivro();
-
-        Importacao result = new Importacao();
-        result.setAutores(new ArrayList<Autor>());
-        result.setLivros(new ArrayList<Livro>());
-
-        for (LibibLivro libibLivro : libibLivros) {
-            Livro livro = new Livro();
-
-            // id
-            livro.setId(SeaTableDao.getNewId());
-
-            // nome
-            String nome = libibLivro.getTitle();
-            String regexIni = "^(.*)(, )((O|A)s?|D(o|a|e)s?|El|L(o|a)s?)";
-            String regex = regexIni + "$";
-            if (nome.matches(regex)) {
-                nome = nome.replaceFirst(regex, "$3 $1");
-            }
-            regex = regexIni + "( ?(\\/|-|:) .*)$";
-            if (nome.matches(regex)) {
-                nome = nome.replaceFirst(regex, "$3 $1$7");
-            }
-            livro.setNome(nome);
-
-            // autores
-            if (libibLivro.getCreators() != null) {
-                livro.setIdsAutores(new ArrayList<String>());
-                String[] splAutores = libibLivro.getCreators().split(",");
-                for (String strAutor : splAutores) {
-                    String nomeAutor = strAutor.trim();
-                    Autor autor = null;
-                    try {
-                        autor = result.getAutores().stream().filter(a -> a.getNome().equals(nomeAutor)).findFirst().get();
-                    } catch (NoSuchElementException e) {
-                        autor = new Autor();
-                        autor.setId(SeaTableDao.getNewId());
-                        autor.setNome(nomeAutor);
-                        result.getAutores().add(autor);
-                    }
-                    livro.getIdsAutores().add(autor.getId());
-                }
-            }
-
-            // isbn13
-            livro.setIsbn13(libibLivro.getEan_isbn13());
-
-            // fim
-            result.getLivros().add(livro);
-        }
-
-        return result;
-    }
-
     @PostMapping(value="/libib/importacao")
     public Importacao libibImportacao() throws StreamReadException, DatabindException, IllegalStateException, FileNotFoundException, IOException, SeaTableDaoException {
         Collection<LibibLivro> libibLivros = libibLivro();
@@ -150,13 +94,17 @@ public class Importa {
                 // isbn13
                 livro.setIsbn13(libibLivro.getEan_isbn13());
 
+                // isbn10
+                livro.setIsbn10(libibLivro.getUpc_isbn10());
+
                 result.getLivros().add(livro);
 
                 Row row = new Row(new Object[][] {
                     { "id", livro.getId() },
                     { "nome", livro.getNome() },
                     { "autores", livro.getIdsAutores() },
-                    { "isbn13", livro.getIsbn13()}
+                    { "isbn13", livro.getIsbn13() },
+                    { "isbn10", livro.getIsbn10() }
                 });
                 dao.addRow(new AddRowParam(
                     row,

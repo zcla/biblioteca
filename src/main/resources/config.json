@@ -47,6 +47,10 @@
                             {
                                 "column_name": "isbn13",
                                 "column_type": "text"
+                            },
+                            {
+                                "column_name": "isbn10",
+                                "column_type": "text"
                             }
                         ]
                     }
