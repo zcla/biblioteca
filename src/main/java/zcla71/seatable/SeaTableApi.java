@@ -156,6 +156,7 @@ public class SeaTableApi {
 
     // https://api.seatable.io/reference/list-rows
     public ListRowsResult listRows(ListRowsParam param) throws IOException {
+        // TODO A API só traz os 1000 primeiros. Fazer mais consultas com o parâmetro "start" até não vir mais nada.
         String url = "https://cloud.seatable.io/dtable-server/api/v1/dtables/" + baseToken.getDtable_uuid() + "/rows/" + param.getUrlParams();
         return (ListRowsResult) doGet(url, ListRowsResult.class);
     }
