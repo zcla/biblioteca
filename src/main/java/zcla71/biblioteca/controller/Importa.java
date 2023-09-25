@@ -89,23 +89,6 @@ public class Importa {
         return result;
     }
 
-    @PostMapping(value="/libib/importacao-old")
-    public Importacao libibImportacao_old() throws StreamReadException, DatabindException, IllegalStateException, FileNotFoundException, IOException, SeaTableDaoException {
-        Importacao result = importa();
-
-        BibliotecaDao dao = BibliotecaDao.getInstance();
-
-        dao.startTransaction();
-        try {
-            dao.commitTransaction();
-
-            return result;
-        } catch (Exception e) {
-            dao.discardTransaction();
-            throw e;
-        }
-    }
-
     @PostMapping(value="/libib/importacao")
     public Importacao libibImportacao() throws StreamReadException, DatabindException, IllegalStateException, FileNotFoundException, IOException, SeaTableDaoException {
         Collection<LibibLivro> libibLivros = libibLivro();
