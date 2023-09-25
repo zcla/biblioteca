@@ -8,7 +8,7 @@
                 "base_name": "biblioteca",
                 "options": {
                     "startup": {
-                        "eraseData": false
+                        "eraseData": true
                     }
                 },
                 "tables": [
