@@ -155,9 +155,9 @@ public class Importa {
                 Row row = new Row(new Object[][] {
                     { "id", livro.getId() },
                     { "nome", livro.getNome() },
+                    { "autores", livro.getIdsAutores() },
                     { "isbn13", livro.getIsbn13()}
                 });
-                row.put("autores", livro.getIdsAutores());
                 dao.addRow(new AddRowParam(
                     row,
                     "livro"
