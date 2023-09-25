@@ -6,6 +6,11 @@
         "bases": [
             {
                 "base_name": "biblioteca",
+                "options": {
+                    "startup": {
+                        "eraseData": false
+                    }
+                },
                 "tables": [
                     {
                         "table_name": "autor",

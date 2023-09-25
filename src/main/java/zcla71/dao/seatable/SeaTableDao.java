@@ -11,7 +11,8 @@ import java.util.UUID;
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
 
-import zcla71.dao.config.SeaTableBase;
+import zcla71.dao.seatable.config.SeaTableBase;
+import zcla71.dao.seatable.config.SeaTableConfig;
 import zcla71.dao.seatable.transaction.TransactionException;
 import zcla71.dao.seatable.transaction.TransactionExecutionData;
 import zcla71.dao.seatable.transaction.TransactionOperation;
@@ -64,6 +65,7 @@ public abstract class SeaTableDao {
         setupDatabase();
     }
 
+    // TODO Dar opção em relação às tabelas: forçar recriação; recriar só se não existir; não mexer.
     private void setupDatabase() throws StreamReadException, DatabindException, IOException, SeaTableDaoException {
         for (SeaTableBase base : config.getBases()) {
             boolean reloadMetadata = false;
@@ -117,22 +119,24 @@ public abstract class SeaTableDao {
                 metadata = api.getMetadata();
             }
 
-            // Exclui dados das tabelas
-            for (Table table : metadata.getMetadata().getTables()) {
-                while (true) {
-                    ListRowsParam lrp = new ListRowsParam(table.getName());
-                    ListRowsResult lrr = api.listRows(lrp);
-                    if (lrr.getRows().size() == 0) {
-                        break;
+            if (base.getOptions().getStartup().getEraseData()) {
+                // Exclui dados das tabelas
+                for (Table table : metadata.getMetadata().getTables()) {
+                    while (true) {
+                        ListRowsParam lrp = new ListRowsParam(table.getName());
+                        ListRowsResult lrr = api.listRows(lrp);
+                        if (lrr.getRows().size() == 0) {
+                            break;
+                        }
+                        DeleteRowsParam param = new DeleteRowsParam();
+                        param.setTable_name(table.getName());
+                        param.setRow_ids(new ArrayList<>());
+                        for (Row row : lrr.getRows()) {
+                            param.getRow_ids().add((String) row.get("_id"));
+                        }
+                        @SuppressWarnings("unused")
+                        DeleteRowsResult drResult = api.deleteRows(param);
                     }
-                    DeleteRowsParam param = new DeleteRowsParam();
-                    param.setTable_name(table.getName());
-                    param.setRow_ids(new ArrayList<>());
-                    for (Row row : lrr.getRows()) {
-                        param.getRow_ids().add((String) row.get("_id"));
-                    }
-                    @SuppressWarnings("unused")
-                    DeleteRowsResult drResult = api.deleteRows(param);
                 }
             }
         }
@@ -202,31 +206,32 @@ public abstract class SeaTableDao {
         
         while (link.size() > 0) {
             TransactionOperation op = link.iterator().next();
-            if (FORCE_ONE_BY_ONE) {
+            // if (FORCE_ONE_BY_ONE) {
                 op.applyIdMap(idMap);
                 op.execute(api);
                 link = link.stream().filter(l -> !(l.equals(op))).toList();
-            } else {
-                if (op instanceof TransactionOperationCreateRowLink tocrl) { // Sempre true por causa do filter acima
-                    String table_id = metadata.getMetadata().getTables().stream().filter(t -> t.getName().equals(tocrl.getParam().getTable_name())).findFirst().get().get_id();
-                    String other_table_id = metadata.getMetadata().getTables().stream().filter(t -> t.getName().equals(tocrl.getParam().getOther_table_name())).findFirst().get().get_id();
-                    String link_id = tocrl.getParam().getLink_id();
-                    Collection<String> row_id_list = new ArrayList<>();
-                    Map<String, Collection<String>> other_rows_ids_map = new HashMap<>();
-                    for (TransactionOperation operation : link) {
-                        if (operation instanceof TransactionOperationCreateRowLink tocrl2) { // Sempre true por causa do filter acima
-                            row_id_list.add(idMap.get(tocrl2.getParam().getTable_row_id()));
-                            Collection<String> param2 = new ArrayList<>();
-                            param2.add(idMap.get(tocrl2.getParam().getOther_table_row_id()));
-                            other_rows_ids_map.put(idMap.get(tocrl2.getParam().getTable_row_id()), param2);
-                        }
-                    }
-                    CreateRowLinksBatchParam crlbParam = new CreateRowLinksBatchParam(table_id, other_table_id, link_id, row_id_list, other_rows_ids_map);
-                    @SuppressWarnings("unused")
-                    CreateRowLinksBatchResult crlbResult = api.createRowLinksBatch(crlbParam);
-                    link = new ArrayList<TransactionOperation>();
-                }
-            }
+            // TODO Tá fazendo tudo errado. Verificar.
+            // } else {
+            //     if (op instanceof TransactionOperationCreateRowLink tocrl) { // Sempre true por causa do filter acima
+            //         String table_id = metadata.getMetadata().getTables().stream().filter(t -> t.getName().equals(tocrl.getParam().getTable_name())).findFirst().get().get_id();
+            //         String other_table_id = metadata.getMetadata().getTables().stream().filter(t -> t.getName().equals(tocrl.getParam().getOther_table_name())).findFirst().get().get_id();
+            //         String link_id = tocrl.getParam().getLink_id();
+            //         Collection<String> row_id_list = new ArrayList<>();
+            //         Map<String, Collection<String>> other_rows_ids_map = new HashMap<>();
+            //         for (TransactionOperation operation : link) {
+            //             if (operation instanceof TransactionOperationCreateRowLink tocrl2) { // Sempre true por causa do filter acima
+            //                 row_id_list.add(idMap.get(tocrl2.getParam().getTable_row_id()));
+            //                 Collection<String> param2 = new ArrayList<>();
+            //                 param2.add(idMap.get(tocrl2.getParam().getOther_table_row_id()));
+            //                 other_rows_ids_map.put(idMap.get(tocrl2.getParam().getTable_row_id()), param2);
+            //             }
+            //         }
+            //         CreateRowLinksBatchParam crlbParam = new CreateRowLinksBatchParam(table_id, other_table_id, link_id, row_id_list, other_rows_ids_map);
+            //         @SuppressWarnings("unused")
+            //         CreateRowLinksBatchResult crlbResult = api.createRowLinksBatch(crlbParam);
+            //         link = new ArrayList<TransactionOperation>();
+            //     }
+            // }
         }
 
         // Fim

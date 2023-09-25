@@ -1,14 +1,15 @@
-package zcla71.biblioteca.model.config;
+package zcla71.dao.seatable.config;
+
+import java.util.Collection;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import zcla71.dao.seatable.config.SeaTableBase;
 
 @NoArgsConstructor
 @AllArgsConstructor
-public class Config {
+public class SeaTableConfig {
     @Getter @Setter
-    private SeaTableBase biblioteca;
+    private Collection<SeaTableBase> bases;
 }

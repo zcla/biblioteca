@@ -1,6 +1,6 @@
 package zcla71.biblioteca.model.config;
 
-import zcla71.dao.seatable.SeaTableConfig;
+import zcla71.dao.seatable.config.SeaTableConfig;
 
 public class BibliotecaConfig {
     private LibibConfig libib;
