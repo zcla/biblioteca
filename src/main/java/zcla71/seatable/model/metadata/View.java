@@ -16,7 +16,7 @@ public class View {
     private String filter_conjunction;
     private Collection<ForceErrorIfNotNull> filters;
     private Collection<ViewSort> sorts;
-    private Collection<ForceErrorIfNotNull> groupbys;
+    private Collection<ViewGroupBy> groupbys;
     private ForceErrorIfNotNull colorbys;
     private Collection<ForceErrorIfNotNull> hidden_columns;
     private Collection<ForceErrorIfNotNull> rows;
