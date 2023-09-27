@@ -5,8 +5,9 @@ import java.util.Collection;
 import lombok.Data;
 
 @Data
-public class ViewColorBys {
+public class ColorBys {
     private String type;
     private Collection<String> color_by_duplicate_column_keys;
-    private Collection<ViewColorByRule> color_by_rules;
+    private Collection<ColorByRule> color_by_rules;
+    private ColorBysRangeSettings range_settings;
 }

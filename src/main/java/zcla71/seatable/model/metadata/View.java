@@ -17,7 +17,7 @@ public class View {
     private Collection<ViewFilter> filters;
     private Collection<ViewSort> sorts;
     private Collection<ViewGroupBy> groupbys;
-    private ViewColorBys colorbys;
+    private ColorBys colorbys;
     private Collection<String> hidden_columns;
     private Collection<ForceErrorIfNotNull> rows;
     private ForceErrorIfNotNull formula_rows;

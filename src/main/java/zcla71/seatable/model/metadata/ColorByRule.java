@@ -5,8 +5,8 @@ import java.util.Collection;
 import lombok.Data;
 
 @Data
-public class ViewColorByRule {
+public class ColorByRule {
     private String color;
-    private Collection<ViewColorByRuleFilter> filters;
+    private Collection<ColorByRuleFilter> filters;
     private String filter_conjunction;
 }

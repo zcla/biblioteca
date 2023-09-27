@@ -19,5 +19,6 @@ public class Column {
     private Collection<ForceErrorIfNotNull> permitted_users;
     private String edit_metadata_permission_type;
     private Collection<ForceErrorIfNotNull> edit_metadata_permitted_users;
-    private ForceErrorIfNotNull description;
+    private String description;
+    private ColorBys colorbys;
 }
