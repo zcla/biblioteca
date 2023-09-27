@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
@@ -68,7 +69,6 @@ public abstract class SeaTableDao {
         setupDatabase();
     }
 
-    // TODO Dar opção em relação às tabelas: forçar recriação; recriar só se não existir; não mexer.
     private void setupDatabase() throws StreamReadException, DatabindException, IOException, SeaTableDaoException {
         for (SeaTableBase base : config.getBases()) {
             boolean reloadMetadata = false;
@@ -257,14 +257,22 @@ public abstract class SeaTableDao {
         }
 
         // "Traduz" de id para _id
-        // TODO Não pode ser assim porque pode haver ids que já estavam no banco.
         Map<String, String> idMap = new HashMap<>();
         for (TransactionExecutionData execution : executions) {
             idMap.putAll(execution.getIds());
         }
-
+        
         // Só os CreateRowLink
         Collection<TransactionOperationCreateRowLink> link = transaction.stream().filter(t -> (t instanceof TransactionOperationCreateRowLink)).map(TransactionOperationCreateRowLink.class::cast).toList();
+        
+        // Procura IDs que não estão no idMap.
+        Collection<CreateRowLinkParam> params = link.stream().map(TransactionOperationCreateRowLink::getParam).collect(Collectors.toCollection(ArrayList::new));
+        Collection<String> idsTodos = params.stream().map(CreateRowLinkParam::getTable_row_id).collect(Collectors.toCollection(ArrayList::new));
+        idsTodos.addAll(params.stream().map(CreateRowLinkParam::getOther_table_row_id).collect(Collectors.toCollection(ArrayList::new)));
+        Collection<String> idsFaltando = idsTodos.stream().filter(id -> idMap.get(id) == null).collect(Collectors.toCollection(ArrayList::new));
+        if (idsFaltando.size() > 0) {
+            throw new RuntimeException("Implementar");
+        }
 
         while (link.size() > 0) {
             TransactionOperationCreateRowLink tocrl1 = link.iterator().next();
