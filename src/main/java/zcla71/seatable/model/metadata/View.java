@@ -14,7 +14,7 @@ public class View {
     private Boolean is_locked;
     private String row_height;
     private String filter_conjunction;
-    private Collection<ForceErrorIfNotNull> filters;
+    private Collection<ViewFilter> filters;
     private Collection<ViewSort> sorts;
     private Collection<ViewGroupBy> groupbys;
     private ForceErrorIfNotNull colorbys;
