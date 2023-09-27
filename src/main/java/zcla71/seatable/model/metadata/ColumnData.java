@@ -21,4 +21,11 @@ public class ColumnData {
     private String format;
     private String decimal;
     private String thousands;
+    // ? (apareceram quando adicionei um campo Number com um "Data processing" do tipo "Calculated accumulated value" atrelado a ele)
+    private Integer precision;
+    private Boolean enable_precision;
+    private Boolean enable_fill_default_value;
+    private Boolean enable_check_format;
+    private Integer format_min_value;
+    private Integer format_max_value;
 }
