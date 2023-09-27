@@ -37,6 +37,8 @@ public class Importa {
     public Importacao libibImportacao() throws StreamReadException, DatabindException, IllegalStateException, FileNotFoundException, IOException, SeaTableDaoException {
         Collection<LibibLivro> libibLivros = libibLivro();
 
+        // TODO Bolar um jeito de identificar dados existentes com os do libib para fazer importação sem precisar excluir tudo.
+
         Importacao result = new Importacao();
         result.setAutores(new ArrayList<Autor>());
         result.setLivros(new ArrayList<Livro>());
