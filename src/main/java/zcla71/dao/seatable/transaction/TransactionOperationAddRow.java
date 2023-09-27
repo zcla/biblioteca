@@ -12,7 +12,7 @@ import zcla71.seatable.model.param.AddRowParam;
 import zcla71.seatable.model.result.AddRowResult;
 
 @NoArgsConstructor
-public class TransactionOperationAddRow extends TransactionOperation {
+public class TransactionOperationAddRow implements TransactionOperationGeneratesId {
     @Getter @Setter
     private AddRowParam param;
     @Getter
@@ -32,10 +32,5 @@ public class TransactionOperationAddRow extends TransactionOperation {
         Map<String, String> result = new HashMap<>();
         result.put((String) param.getRow().get("id"), this.result.get("_id"));
         return result;
-    }
-
-    @Override
-    public void applyIdMap(Map<String, String> idMap) {
-        // Não precisa
     }
 }

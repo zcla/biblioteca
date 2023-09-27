@@ -20,6 +20,7 @@ import zcla71.dao.seatable.transaction.TransactionOperation;
 import zcla71.dao.seatable.transaction.TransactionOperationAddRow;
 import zcla71.dao.seatable.transaction.TransactionOperationAppendRows;
 import zcla71.dao.seatable.transaction.TransactionOperationCreateRowLink;
+import zcla71.dao.seatable.transaction.TransactionOperationGeneratesId;
 import zcla71.seatable.SeaTableApi;
 import zcla71.seatable.model.ddl.ColumnDef;
 import zcla71.seatable.model.ddl.ColumnDefNumber;
@@ -251,7 +252,9 @@ public abstract class SeaTableDao {
                 }
             }
             actualOperation.execute(api);
-            executions.add(new TransactionExecutionData(actualOperation));
+            if (actualOperation instanceof TransactionOperationGeneratesId togi) {
+                executions.add(new TransactionExecutionData(togi));
+            }
             final Collection<TransactionOperation> ro = resolvedOperations;
             nonLink = nonLink.stream().filter(nl -> !ro.contains(nl)).toList();
         }

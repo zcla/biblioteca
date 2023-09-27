@@ -11,7 +11,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class TransactionExecutionData {
     @Getter @Setter
-    private TransactionOperation operation;
+    private TransactionOperationGeneratesId operation;
 
     public Map<String, String> getIds() {
         return operation.getIdMap();

@@ -16,7 +16,7 @@ import zcla71.seatable.model.result.AppendRowsResult;
 import zcla71.seatable.model.result.ListRowsSqlResult;
 
 @NoArgsConstructor
-public class TransactionOperationAppendRows extends TransactionOperation {
+public class TransactionOperationAppendRows implements TransactionOperationGeneratesId {
     @Getter @Setter
     private AppendRowsParam param;
     @Getter
@@ -59,10 +59,5 @@ public class TransactionOperationAppendRows extends TransactionOperation {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    @Override
-    public void applyIdMap(Map<String, String> idMap) {
-        // Não precisa
     }
 }

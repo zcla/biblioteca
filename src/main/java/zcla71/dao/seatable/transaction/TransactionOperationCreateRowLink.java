@@ -1,7 +1,6 @@
 package zcla71.dao.seatable.transaction;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 import lombok.Getter;
@@ -12,7 +11,7 @@ import zcla71.seatable.model.param.CreateRowLinkParam;
 import zcla71.seatable.model.result.CreateRowLinkResult;
 
 @NoArgsConstructor
-public class TransactionOperationCreateRowLink extends TransactionOperation {
+public class TransactionOperationCreateRowLink implements TransactionOperationRequiresId {
     @Getter @Setter
     private CreateRowLinkParam param;
     @Getter
@@ -25,12 +24,6 @@ public class TransactionOperationCreateRowLink extends TransactionOperation {
     @Override
     public void execute(SeaTableApi api) throws IOException {
         result = api.createRowLink(param);
-    }
-
-    @Override
-    public Map<String, String> getIdMap() {
-        // Não cria id
-        return new HashMap<>();
     }
 
     @Override
