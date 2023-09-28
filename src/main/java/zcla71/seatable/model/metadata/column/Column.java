@@ -1,12 +1,15 @@
-package zcla71.seatable.model.metadata;
+package zcla71.seatable.model.metadata.column;
 
 import java.util.Collection;
 
 import lombok.Data;
 import zcla71.biblioteca.model.ForceErrorIfNotNull;
+import zcla71.seatable.model.metadata.ColorBys;
+import zcla71.seatable.model.metadata.columndata.ColumnData;
 
 @Data
 public class Column {
+    // TODO Herança por type
     private String key;
     private String type;
     private String name;

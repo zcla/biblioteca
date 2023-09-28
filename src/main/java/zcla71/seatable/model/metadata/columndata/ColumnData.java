@@ -1,4 +1,4 @@
-package zcla71.seatable.model.metadata;
+package zcla71.seatable.model.metadata.columndata;
 
 import lombok.Data;
 import zcla71.biblioteca.model.ForceErrorIfNotNull;
