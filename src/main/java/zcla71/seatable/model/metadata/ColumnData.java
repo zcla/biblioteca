@@ -5,6 +5,7 @@ import zcla71.biblioteca.model.ForceErrorIfNotNull;
 
 @Data
 public class ColumnData {
+    // TODO Herança
     // link
     private String display_column_key;
     private Boolean is_internal;
