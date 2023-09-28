@@ -1,6 +1,6 @@
 package zcla71.seatable.model.ddl;
 
-public class ColumnDataLink {
+public class ColumnDefDataLink {
     private String table;
     private String other_table;
 

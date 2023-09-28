@@ -29,6 +29,7 @@ import zcla71.seatable.model.metadata.Metadata;
 import zcla71.seatable.model.metadata.Row;
 import zcla71.seatable.model.metadata.Table;
 import zcla71.seatable.model.metadata.column.Column;
+import zcla71.seatable.model.metadata.column.ColumnLink;
 import zcla71.seatable.model.param.AddRowParam;
 import zcla71.seatable.model.param.AppendRowsParam;
 import zcla71.seatable.model.param.CreateNewTableParam;
@@ -339,16 +340,16 @@ public abstract class SeaTableDao {
         Table table = metadata.getMetadata().getTables().stream().filter(t -> t.getName().equals(arParam.getTable_name())).findFirst().get();
         for (String rowKey : arParam.getRow().keySet()) {
             Column column = table.getColumns().stream().filter(c -> c.getName().equals(rowKey)).findFirst().get();
-            if (column.getType().equals("link")) {
+            if (column instanceof ColumnLink columnLink) {
                 @SuppressWarnings("unchecked")
-                Collection<String> other_table_row_ids = (Collection<String>) arParam.getRow().get(column.getName());
+                Collection<String> other_table_row_ids = (Collection<String>) arParam.getRow().get(columnLink.getName());
                 if (other_table_row_ids != null) {
                     for (String other_table_row_id : other_table_row_ids) {
                         CreateRowLinkParam crlParam = new CreateRowLinkParam();
                         crlParam.setTable_name(table.getName());
-                        String otherTableName = metadata.getMetadata().getTables().stream().filter(t -> t.get_id().equals(column.getData().getOther_table_id())).findFirst().get().getName();
+                        String otherTableName = metadata.getMetadata().getTables().stream().filter(t -> t.get_id().equals(columnLink.getData().getOther_table_id())).findFirst().get().getName();
                         crlParam.setOther_table_name(otherTableName);
-                        crlParam.setLink_id(column.getData().getLink_id());
+                        crlParam.setLink_id(columnLink.getData().getLink_id());
                         crlParam.setTable_row_id((String) arParam.getRow().get("id"));
                         crlParam.setOther_table_row_id(other_table_row_id);
                         this.transaction.add(new TransactionOperationCreateRowLink(crlParam));

@@ -3,7 +3,7 @@ package zcla71.seatable.model.ddl;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ColumnDataNumber {
+public class ColumnDefDataNumber {
     public enum Format { number, percent, dollar, euro, yuan };
     public enum Decimal { dot, comma };
     public enum Thousands { no, space, comma };
