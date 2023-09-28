@@ -5,9 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import zcla71.seatable.model.ddl.ColumnDef;
-import zcla71.seatable.model.ddl.ColumnDefLink;
-import zcla71.seatable.model.ddl.ColumnDefNumber;
+import zcla71.seatable.model.ddl.columndef.ColumnDef;
+import zcla71.seatable.model.ddl.columndef.ColumnDefLink;
+import zcla71.seatable.model.ddl.columndef.ColumnDefNumber;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @NoArgsConstructor

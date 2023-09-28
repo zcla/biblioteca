@@ -2,6 +2,8 @@ package zcla71.seatable.model.ddl;
 
 import java.util.Collection;
 
+import zcla71.seatable.model.ddl.columndef.ColumnDef;
+
 public class TableDef {
     private String table_name;
     private Collection<ColumnDef> columns;

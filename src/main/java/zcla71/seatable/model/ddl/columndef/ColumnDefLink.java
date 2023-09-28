@@ -1,4 +1,6 @@
-package zcla71.seatable.model.ddl;
+package zcla71.seatable.model.ddl.columndef;
+
+import zcla71.seatable.model.ddl.ColumnDataLink;
 
 public class ColumnDefLink extends ColumnDef {
     private ColumnDataLink column_data;
