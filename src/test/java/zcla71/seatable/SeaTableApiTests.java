@@ -32,9 +32,9 @@ class SeaTableApiTests {
 		assertNotNull(config);
 		assertNotNull(config.getSeaTable());
 		assertNotNull(config.getSeaTable().getBases());
-		assertEquals(config.getSeaTable().getBases().size(), 1);
+		assertEquals(1, config.getSeaTable().getBases().size());
 		SeaTableBase base = config.getSeaTable().getBases().iterator().next();
-		assertEquals(base.getBase_name(), "teste");
+		assertEquals("teste", base.getBase_name());
 	}
 	
 	@Test
@@ -52,7 +52,7 @@ class SeaTableApiTests {
 	@Test
 	void getMetadata() throws IOException {
 		Metadata metadata = api.getMetadata();
-		assertEquals(metadata.getMetadata().getFormat_version(), 9);
-		assertEquals(metadata.getMetadata().getVersion(), 16);
+		assertEquals(9, metadata.getMetadata().getFormat_version());
+		// assertEquals(30, metadata.getMetadata().getVersion()); // Variável. Parece ser um número de versionamento da base.
 	}
 }
