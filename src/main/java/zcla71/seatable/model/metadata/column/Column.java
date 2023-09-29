@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 
 import lombok.Data;
 import zcla71.biblioteca.model.ForceErrorIfNotNull;
-import zcla71.seatable.model.metadata.columndata.ColumnData;
+import zcla71.seatable.model.metadata.column.data.ColumnData;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = As.PROPERTY, property = "type", visible = true)
 @JsonSubTypes({

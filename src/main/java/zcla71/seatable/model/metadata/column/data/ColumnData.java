@@ -1,4 +1,4 @@
-package zcla71.seatable.model.metadata.columndata;
+package zcla71.seatable.model.metadata.column.data;
 
 import lombok.Data;
 
