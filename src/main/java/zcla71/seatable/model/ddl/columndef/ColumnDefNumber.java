@@ -2,7 +2,7 @@ package zcla71.seatable.model.ddl.columndef;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import zcla71.seatable.model.ddl.ColumnDefDataNumber;
+import zcla71.seatable.model.ddl.columndef.data.ColumnDefDataNumber;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ColumnDefNumber extends ColumnDef {
