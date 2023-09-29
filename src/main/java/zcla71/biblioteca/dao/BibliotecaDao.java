@@ -12,12 +12,12 @@ import com.fasterxml.jackson.databind.DatabindException;
 import com.opencsv.bean.CsvToBeanBuilder;
 import com.opencsv.enums.CSVReaderNullFieldIndicator;
 
-import zcla71.biblioteca.Application;
 import zcla71.biblioteca.model.config.BibliotecaConfig;
 import zcla71.biblioteca.model.libib.LibibLivro;
 import zcla71.biblioteca.model.secret.Secret;
 import zcla71.dao.seatable.SeaTableDao;
 import zcla71.dao.seatable.SeaTableDaoException;
+import zcla71.utils.Utils;
 
 public class BibliotecaDao extends SeaTableDao {
     private static String CONFIG_RESOURCE_LOCATION = "/config.json";
@@ -26,8 +26,8 @@ public class BibliotecaDao extends SeaTableDao {
 
     public static BibliotecaDao getInstance() throws StreamReadException, DatabindException, IOException, SeaTableDaoException {
         if (instance == null) {
-            BibliotecaConfig config = (BibliotecaConfig) Application.getResource(BibliotecaConfig.class, CONFIG_RESOURCE_LOCATION);
-            Secret secret = (Secret) Application.getResource(Secret.class, SECRET_RESOURCE_LOCATION);
+            BibliotecaConfig config = Utils.getResourceAsObject(BibliotecaConfig.class, CONFIG_RESOURCE_LOCATION);
+            Secret secret = Utils.getResourceAsObject(Secret.class, SECRET_RESOURCE_LOCATION);
             instance = new BibliotecaDao(config, secret);
         }
         return instance;
