@@ -1,0 +1,18 @@
+{
+    "seaTable": {
+        "bases": [
+            {
+                "base_name": "teste",
+                "options": {
+                    "startup": {
+                        "recreateExistingTables": false,
+                        "createMissingTables": false,
+                        "createMissingColumns": false,
+                        "removeAlienTables": false,
+                        "eraseData": false
+                    }
+                }
+            }
+        ]
+    }
+}

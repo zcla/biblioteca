@@ -11,7 +11,7 @@ public class Table {
     private String _id;
     private String name;
     private Boolean is_header_locked;
-    private ForceErrorIfNotNull header_settings;
+    private TableHeaderSettings header_settings;
     private ForceErrorIfNotNull summary_configs;
     private Collection<Column> columns;
     private Collection<ForceErrorIfNotNull> rows;
