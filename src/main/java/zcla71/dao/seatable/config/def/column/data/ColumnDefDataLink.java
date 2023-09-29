@@ -1,4 +1,4 @@
-package zcla71.seatable.model.ddl.columndef.data;
+package zcla71.dao.seatable.config.def.column.data;
 
 public class ColumnDefDataLink {
     private String table;

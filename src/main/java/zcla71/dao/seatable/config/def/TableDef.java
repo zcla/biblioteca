@@ -1,8 +1,8 @@
-package zcla71.seatable.model.ddl;
+package zcla71.dao.seatable.config.def;
 
 import java.util.Collection;
 
-import zcla71.seatable.model.ddl.columndef.ColumnDef;
+import zcla71.dao.seatable.config.def.column.ColumnDef;
 
 public class TableDef {
     private String table_name;

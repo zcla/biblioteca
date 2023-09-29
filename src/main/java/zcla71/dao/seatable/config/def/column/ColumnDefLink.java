@@ -1,6 +1,6 @@
-package zcla71.seatable.model.ddl.columndef;
+package zcla71.dao.seatable.config.def.column;
 
-import zcla71.seatable.model.ddl.columndef.data.ColumnDefDataLink;
+import zcla71.dao.seatable.config.def.column.data.ColumnDefDataLink;
 
 public class ColumnDefLink extends ColumnDef {
     private ColumnDefDataLink column_data;

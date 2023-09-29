@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import zcla71.seatable.model.ddl.TableDef;
+import zcla71.dao.seatable.config.def.TableDef;
 
 @NoArgsConstructor
 @AllArgsConstructor

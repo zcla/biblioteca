@@ -1,8 +1,8 @@
-package zcla71.seatable.model.ddl.columndef;
+package zcla71.dao.seatable.config.def.column;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import zcla71.seatable.model.ddl.columndef.data.ColumnDefDataNumber;
+import zcla71.dao.seatable.config.def.column.data.ColumnDefDataNumber;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ColumnDefNumber extends ColumnDef {

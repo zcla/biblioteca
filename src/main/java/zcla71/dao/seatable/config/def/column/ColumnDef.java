@@ -1,4 +1,4 @@
-package zcla71.seatable.model.ddl.columndef;
+package zcla71.dao.seatable.config.def.column;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;

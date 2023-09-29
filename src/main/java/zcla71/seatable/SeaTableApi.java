@@ -10,8 +10,8 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 
+import zcla71.dao.seatable.config.def.column.ColumnDef;
 import zcla71.seatable.model.BaseToken;
-import zcla71.seatable.model.ddl.columndef.ColumnDef;
 import zcla71.seatable.model.metadata.Metadata;
 import zcla71.seatable.model.param.AppendRowsParam;
 import zcla71.seatable.model.param.CreateNewTableParam;
