@@ -12,9 +12,10 @@ import zcla71.seatable.model.metadata.colorby.ColorBys;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = As.PROPERTY, property = "type", visible = true)
 @JsonSubTypes({
-    @JsonSubTypes.Type(value = ColumnLink.class, name = "link"),
+    @JsonSubTypes.Type(value = ColumnText.class, name = "text"),
+    @JsonSubTypes.Type(value = ColumnLongText.class, name = "long-text"),
     @JsonSubTypes.Type(value = ColumnNumber.class, name = "number"),
-    @JsonSubTypes.Type(value = ColumnText.class, name = "text")
+    @JsonSubTypes.Type(value = ColumnLink.class, name = "link")
 })
 @Data
 public class Column {

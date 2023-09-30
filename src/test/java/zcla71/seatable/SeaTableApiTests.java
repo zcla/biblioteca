@@ -53,6 +53,5 @@ class SeaTableApiTests {
 	void getMetadata() throws IOException {
 		Metadata metadata = api.getMetadata();
 		assertEquals(9, metadata.getMetadata().getFormat_version());
-		// assertEquals(30, metadata.getMetadata().getVersion()); // Variável. Parece ser um número de versionamento da base.
 	}
 }
