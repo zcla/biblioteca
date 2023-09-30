@@ -2,14 +2,9 @@ package zcla71.dao.seatable.config;
 
 import java.util.Collection;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 
-@NoArgsConstructor
-@AllArgsConstructor
+@Data
 public class SeaTableConfig {
-    @Getter @Setter
     private Collection<SeaTableBase> bases;
 }

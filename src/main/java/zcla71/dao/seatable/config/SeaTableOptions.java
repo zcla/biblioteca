@@ -1,13 +1,8 @@
 package zcla71.dao.seatable.config;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 
-@NoArgsConstructor
-@AllArgsConstructor
+@Data
 public class SeaTableOptions {
-    @Getter @Setter
     private SeaTableOptionsStartup startup;
 }

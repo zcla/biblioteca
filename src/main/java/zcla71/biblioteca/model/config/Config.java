@@ -1,14 +1,9 @@
 package zcla71.biblioteca.model.config;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 import zcla71.dao.seatable.config.SeaTableBase;
 
-@NoArgsConstructor
-@AllArgsConstructor
+@Data
 public class Config {
-    @Getter @Setter
     private SeaTableBase biblioteca;
 }

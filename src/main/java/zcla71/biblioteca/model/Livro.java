@@ -4,25 +4,15 @@ import java.util.Collection;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 
-@NoArgsConstructor
-@AllArgsConstructor
+@Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Livro {
-    @Getter @Setter
     private String id;
-    @Getter @Setter
     private String nome;
-    @Getter @Setter
     private Collection<String> idsAutores;
-    @Getter @Setter
     private String isbn13;
-    @Getter @Setter
     private String isbn10;
-    @Getter @Setter
     private String descricao;
 }

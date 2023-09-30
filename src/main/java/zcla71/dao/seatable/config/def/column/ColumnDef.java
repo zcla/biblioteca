@@ -6,8 +6,10 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 
+import lombok.Data;
 import zcla71.seatable.exception.ValidationException;
 
+@Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = As.PROPERTY, property = "column_type", visible = true)
 @JsonSubTypes({
@@ -19,10 +21,6 @@ import zcla71.seatable.exception.ValidationException;
 public abstract class ColumnDef {
     private String column_name;
     private String column_type;
-
-    public String getColumn_name() {
-        return column_name;
-    }
 
     public void setColumn_name(String column_name) {
         if (!column_name.matches("^[^.}{`]*$")) {
