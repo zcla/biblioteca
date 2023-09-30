@@ -15,7 +15,28 @@ import zcla71.seatable.model.metadata.colorby.ColorBys;
     @JsonSubTypes.Type(value = ColumnText.class, name = "text"),
     @JsonSubTypes.Type(value = ColumnLongText.class, name = "long-text"),
     @JsonSubTypes.Type(value = ColumnNumber.class, name = "number"),
+    // TODO Collaborator
+    // TODO Date
+    // TODO Duration
+    // TODO SingleSelect
+    // TODO MultipleSelect
+    // TODO Image
+    // TODO File
+    // TODO Email
+    // TODO URL
+    // TODO Checkbox
+    // TODO Rating
+    // TODO Formula
+    // TODO LinkFormula
+    // TODO Geolocation
     @JsonSubTypes.Type(value = ColumnLink.class, name = "link")
+    // TODO Creator
+    // TODO CreatedTime
+    // TODO LastModifier
+    // TODO LastModifiedTime
+    // TODO AutoNumber
+    // TODO Button
+    // TODO DigitalSignature
 })
 @Data
 public class Column {
