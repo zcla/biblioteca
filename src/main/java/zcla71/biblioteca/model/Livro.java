@@ -23,4 +23,6 @@ public class Livro {
     private String isbn13;
     @Getter @Setter
     private String isbn10;
+    @Getter @Setter
+    private String descricao;
 }

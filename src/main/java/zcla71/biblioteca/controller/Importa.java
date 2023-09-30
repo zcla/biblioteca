@@ -99,6 +99,9 @@ public class Importa {
                 // isbn10
                 livro.setIsbn10(libibLivro.getUpc_isbn10());
 
+                // description
+                livro.setDescricao(libibLivro.getDescription());
+
                 result.getLivros().add(livro);
 
                 Row row = new Row(new Object[][] {
@@ -106,7 +109,8 @@ public class Importa {
                     { "nome", livro.getNome() },
                     { "autores", livro.getIdsAutores() },
                     { "isbn13", livro.getIsbn13() },
-                    { "isbn10", livro.getIsbn10() }
+                    { "isbn10", livro.getIsbn10() },
+                    { "descricao", livro.getDescricao() }
                 });
                 dao.addRow(new AddRowParam(
                     row,

@@ -12,6 +12,7 @@ import zcla71.seatable.exception.ValidationException;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = As.PROPERTY, property = "column_type", visible = true)
 @JsonSubTypes({
     @JsonSubTypes.Type(value = ColumnDefText.class, name = "text"),
+    @JsonSubTypes.Type(value = ColumnDefLongText.class, name = "long-text"),
     @JsonSubTypes.Type(value = ColumnDefNumber.class, name = "number"),
     @JsonSubTypes.Type(value = ColumnDefLink.class, name = "link")
 })

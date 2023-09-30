@@ -55,6 +55,10 @@
                             {
                                 "column_name": "isbn10",
                                 "column_type": "text"
+                            },
+                            {
+                                "column_name": "descricao",
+                                "column_type": "long-text"
                             }
                         ]
                     }
