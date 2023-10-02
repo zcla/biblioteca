@@ -30,6 +30,19 @@
                         ]
                     },
                     {
+                        "table_name": "editora",
+                        "columns": [
+                            {
+                                "column_name": "id",
+                                "column_type": "text"
+                            },
+                            {
+                                "column_name": "nome",
+                                "column_type": "text"
+                            }
+                        ]
+                    },
+                    {
                         "table_name": "livro",
                         "columns": [
                             {
@@ -59,6 +72,14 @@
                             {
                                 "column_name": "descricao",
                                 "column_type": "long-text"
+                            },
+                            {
+                                "column_name": "editoras",
+                                "column_type": "link",
+                                "column_data": {
+                                    "table": "livro",
+                                    "other_table": "editora"
+                                }
                             }
                         ]
                     }

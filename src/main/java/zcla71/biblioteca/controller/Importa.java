@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.DatabindException;
 
 import zcla71.biblioteca.dao.BibliotecaDao;
 import zcla71.biblioteca.model.Autor;
+import zcla71.biblioteca.model.Editora;
 import zcla71.biblioteca.model.Livro;
 import zcla71.biblioteca.model.libib.Importacao;
 import zcla71.biblioteca.model.libib.LibibLivro;
@@ -41,6 +42,7 @@ public class Importa {
 
         Importacao result = new Importacao();
         result.setAutores(new ArrayList<Autor>());
+        result.setEditoras(new ArrayList<Editora>());
         result.setLivros(new ArrayList<Livro>());
 
         BibliotecaDao dao = BibliotecaDao.getInstance();
@@ -102,6 +104,35 @@ public class Importa {
                 // description
                 livro.setDescricao(libibLivro.getDescription());
 
+                // editoras
+                if (libibLivro.getPublisher() != null) {
+                    livro.setIdsEditoras(new ArrayList<String>());
+                    String[] splEditoras = libibLivro.getPublisher().split(",");
+                    for (String strEditora : splEditoras) {
+                        String nomeEditora = strEditora.trim();
+                        Editora editora = null;
+                        try {
+                            editora = result.getEditoras().stream().filter(a -> a.getNome().equals(nomeEditora)).findFirst().get();
+                        } catch (NoSuchElementException e) {
+                            editora = new Editora();
+                            editora.setId(SeaTableDao.getNewId());
+                            editora.setNome(nomeEditora);
+                            result.getEditoras().add(editora);
+
+                            dao.addRow(new AddRowParam(
+                                new Row(new Object[][] {
+                                    { "id", editora.getId() },
+                                    { "nome", editora.getNome() }
+                                }),
+                                "editora"
+                            ));
+                        }
+                        livro.getIdsEditoras().add(editora.getId());
+                    }
+                }
+
+                // TODO Tratar description quando contiver json.
+
                 result.getLivros().add(livro);
 
                 Row row = new Row(new Object[][] {
@@ -110,7 +141,8 @@ public class Importa {
                     { "autores", livro.getIdsAutores() },
                     { "isbn13", livro.getIsbn13() },
                     { "isbn10", livro.getIsbn10() },
-                    { "descricao", livro.getDescricao() }
+                    { "descricao", livro.getDescricao() },
+                    { "editoras", livro.getIdsEditoras() }
                 });
                 dao.addRow(new AddRowParam(
                     row,

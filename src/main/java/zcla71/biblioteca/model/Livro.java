@@ -15,4 +15,5 @@ public class Livro {
     private String isbn13;
     private String isbn10;
     private String descricao;
+    private Collection<String> idsEditoras;
 }
