@@ -35,7 +35,7 @@ public class Importa {
     }
 
     @PostMapping(value="/libib/importacao")
-    public Importacao libibImportacao() throws StreamReadException, DatabindException, IllegalStateException, FileNotFoundException, IOException, SeaTableDaoException {
+    public Importacao libibImportacao() throws Exception {
         Collection<LibibLivro> libibLivros = libibLivro();
 
         // TODO Bolar um jeito de identificar dados existentes com os do libib para fazer importação sem precisar excluir tudo.
@@ -131,6 +131,9 @@ public class Importa {
                     }
                 }
 
+                // dataPublicacao
+                livro.setDataPublicacao(libibLivro.getPublish_date());
+
                 // TODO Tratar description quando contiver json.
 
                 result.getLivros().add(livro);
@@ -142,7 +145,8 @@ public class Importa {
                     { "isbn13", livro.getIsbn13() },
                     { "isbn10", livro.getIsbn10() },
                     { "descricao", livro.getDescricao() },
-                    { "editoras", livro.getIdsEditoras() }
+                    { "editoras", livro.getIdsEditoras() },
+                    { "dataPublicacao", livro.getDataPublicacao() }
                 });
                 dao.addRow(new AddRowParam(
                     row,

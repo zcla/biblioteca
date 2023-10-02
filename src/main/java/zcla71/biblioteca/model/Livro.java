@@ -16,4 +16,5 @@ public class Livro {
     private String isbn10;
     private String descricao;
     private Collection<String> idsEditoras;
+    private String dataPublicacao; // TODO Simplifiquei para não parar, mas o certo é implementar como Date
 }

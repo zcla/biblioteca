@@ -80,6 +80,13 @@
                                     "table": "livro",
                                     "other_table": "editora"
                                 }
+                            },
+                            {
+                                "column_name": "dataPublicacao",
+                                "column_type": "date",
+                                "column_data": {
+                                    "format": "ISO_FORMAT"
+                                }
                             }
                         ]
                     }

@@ -16,6 +16,7 @@ import zcla71.seatable.exception.ValidationException;
     @JsonSubTypes.Type(value = ColumnDefText.class, name = "text"),
     @JsonSubTypes.Type(value = ColumnDefLongText.class, name = "long-text"),
     @JsonSubTypes.Type(value = ColumnDefNumber.class, name = "number"),
+    @JsonSubTypes.Type(value = ColumnDefDate.class, name = "date"),
     @JsonSubTypes.Type(value = ColumnDefLink.class, name = "link")
 })
 public abstract class ColumnDef {
