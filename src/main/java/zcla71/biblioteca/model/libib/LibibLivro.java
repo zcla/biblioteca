@@ -1,5 +1,9 @@
 package zcla71.biblioteca.model.libib;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.opencsv.bean.CsvBindByName;
 
@@ -66,4 +70,15 @@ public class LibibLivro {
     private String added;
     @CsvBindByName
     private String copies;
+
+    private Date asDate(String strDate) throws ParseException {
+        if (strDate != null) {
+            return (new SimpleDateFormat("yyyy-MM-dd")).parse(strDate);
+        }
+        return null;
+    }
+
+    public Date publish_dateAsDate() throws ParseException {
+        return asDate(publish_date);
+    }
 }

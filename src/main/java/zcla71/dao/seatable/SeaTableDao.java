@@ -1,8 +1,11 @@
 package zcla71.dao.seatable;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -29,6 +32,7 @@ import zcla71.seatable.model.metadata.Metadata;
 import zcla71.seatable.model.metadata.Row;
 import zcla71.seatable.model.metadata.Table;
 import zcla71.seatable.model.metadata.column.Column;
+import zcla71.seatable.model.metadata.column.ColumnDate;
 import zcla71.seatable.model.metadata.column.ColumnLink;
 import zcla71.seatable.model.param.AddRowParam;
 import zcla71.seatable.model.param.AppendRowsParam;
@@ -217,7 +221,7 @@ public abstract class SeaTableDao {
         transaction = new ArrayList<>();
     }
 
-    public void commitTransaction() throws TransactionException, IOException {
+    public void commitTransaction() throws IOException, SeaTableDaoException {
         if (transaction == null) {
             throw new TransactionException("Não há transação em andamento!");
         }
@@ -227,16 +231,19 @@ public abstract class SeaTableDao {
         Collection<TransactionOperation> nonLink = transaction.stream().filter(t -> ! (t instanceof TransactionOperationCreateRowLink)).toList();
         while (nonLink.size() > 0) {
             TransactionOperation singleOperation = nonLink.iterator().next();
+            
             TransactionOperation actualOperation = null;
             Collection<TransactionOperation> resolvedOperations = new ArrayList<>();
             if (FORCE_ONE_BY_ONE) {
                 actualOperation = singleOperation;
+                converteDadosParaValoresEsperadosPelaAPI(actualOperation);
                 resolvedOperations.add(singleOperation);
             } else {
                 if (singleOperation instanceof TransactionOperationAddRow arOperation) {
                     resolvedOperations = transaction.stream().filter(t -> (t instanceof TransactionOperationAddRow toar) && (toar.getParam().getTable_name().equals(arOperation.getParam().getTable_name()))).toList();
                     AppendRowsParam arParam = new AppendRowsParam(new ArrayList<Row>(), arOperation.getParam().getTable_name());
                     for (TransactionOperation operation : resolvedOperations) {
+                        converteDadosParaValoresEsperadosPelaAPI(operation);
                         if (operation instanceof TransactionOperationAddRow aro) { // Sempre true por causa do filter acima
                             Row row = new Row();
                             for (String key : aro.getParam().getRow().keySet()) {
@@ -265,10 +272,10 @@ public abstract class SeaTableDao {
         for (TransactionExecutionData execution : executions) {
             idMap.putAll(execution.getIds());
         }
-        
+
         // Só os CreateRowLink
         Collection<TransactionOperationCreateRowLink> link = transaction.stream().filter(t -> (t instanceof TransactionOperationCreateRowLink)).map(TransactionOperationCreateRowLink.class::cast).toList();
-        
+
         // Procura IDs que não estão no idMap.
         Collection<CreateRowLinkParam> params = link.stream().map(TransactionOperationCreateRowLink::getParam).collect(Collectors.toCollection(ArrayList::new));
         Collection<String> idsTodos = params.stream().map(CreateRowLinkParam::getTable_row_id).collect(Collectors.toCollection(ArrayList::new));
@@ -324,6 +331,57 @@ public abstract class SeaTableDao {
 
         // Fim
         discardTransaction();
+    }
+
+    private void converteDadosParaValoresEsperadosPelaAPI(TransactionOperation singleOperation) throws SeaTableDaoException {
+        if (singleOperation instanceof TransactionOperationAddRow toar) {
+            Row row = toar.getParam().getRow();
+            for (String key : row.keySet()) {
+                Object value = row.get(key);
+                // "Traduz" as datas para o formato esperado pela API
+                if (value instanceof Date) {
+                    String table_name = toar.getParam().getTable_name();
+                    Table table = metadata.getMetadata().getTables().stream().filter(t -> t.getName().equals(table_name)).findFirst().get();
+                    String column_name = key;
+                    Column column = table.getColumns().stream().filter(c -> c.getName().equals(column_name)).findFirst().get();
+                    if (column instanceof ColumnDate cd) {
+                        String format = cd.getData().getFormat();
+                        DateFormat df = null;
+                        switch (format) {
+                            case "YYYY-MM-DD":
+                                df = new SimpleDateFormat("yyyy-MM-dd");
+                                break;
+                            case "YYYY-MM-DD HH:mm":
+                                df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+                                break;
+                            case "M/D/YYYY":
+                                df = new SimpleDateFormat("M/d/yyyy");
+                                break;
+                            case "M/D/YYYY HH:mm":
+                                df = new SimpleDateFormat("M/d/yyyy HH:mm");
+                                break;
+                            case "DD/MM/YYYY":
+                                df = new SimpleDateFormat("dd/MM/yyyy");
+                                break;
+                            case "DD/MM/YYYY HH:mm":
+                                df = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+                                break;
+                            case "DD.MM.YYYY":
+                                df = new SimpleDateFormat("dd.MM.yyyy");
+                                break;
+                            case "DD.MM.YYYY HH:mm":
+                                df = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+                                break;
+                            default:
+                                throw new SeaTableDaoException("Formato de data desconhecido: " + format);
+                        }
+                        row.put(key, df.format(value));
+                    } else {
+                        throw new SeaTableDaoException("Tentando colocar um java.util.Date numa coluna do tipo " + column.getType() + "?");
+                    }
+                }
+            }
+        }
     }
 
     public void discardTransaction() throws TransactionException {

@@ -1,6 +1,7 @@
 package zcla71.biblioteca.model;
 
 import java.util.Collection;
+import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -16,5 +17,5 @@ public class Livro {
     private String isbn10;
     private String descricao;
     private Collection<String> idsEditoras;
-    private String dataPublicacao; // TODO Simplifiquei para não parar, mas o certo é implementar como Date
+    private Date dataPublicacao;
 }

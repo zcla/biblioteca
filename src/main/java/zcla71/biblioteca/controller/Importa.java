@@ -132,7 +132,7 @@ public class Importa {
                 }
 
                 // dataPublicacao
-                livro.setDataPublicacao(libibLivro.getPublish_date());
+                livro.setDataPublicacao(libibLivro.publish_dateAsDate());
 
                 // TODO Tratar description quando contiver json.
 
