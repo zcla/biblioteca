@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.DatabindException;
 import zcla71.biblioteca.dao.BibliotecaDao;
 import zcla71.biblioteca.model.Autor;
 import zcla71.biblioteca.model.Editora;
+import zcla71.biblioteca.model.Grupo;
 import zcla71.biblioteca.model.Livro;
 import zcla71.biblioteca.model.libib.Importacao;
 import zcla71.biblioteca.model.libib.LibibLivro;
@@ -43,6 +44,7 @@ public class Importa {
         Importacao result = new Importacao();
         result.setAutores(new ArrayList<Autor>());
         result.setEditoras(new ArrayList<Editora>());
+        result.setGrupos(new ArrayList<Grupo>());
         result.setLivros(new ArrayList<Livro>());
 
         BibliotecaDao dao = BibliotecaDao.getInstance();
@@ -134,6 +136,29 @@ public class Importa {
                 // dataPublicacao
                 livro.setDataPublicacao(libibLivro.publish_dateAsDate());
 
+                // grupo
+                if (libibLivro.getGroup() != null) {
+                    String nomeGrupo = libibLivro.getGroup().trim();
+                    Grupo grupo = null;
+                    try {
+                        grupo = result.getGrupos().stream().filter(a -> a.getNome().equals(nomeGrupo)).findFirst().get();
+                    } catch (NoSuchElementException e) {
+                        grupo = new Grupo();
+                        grupo.setId(SeaTableDao.getNewId());
+                        grupo.setNome(nomeGrupo);
+                        result.getGrupos().add(grupo);
+
+                        dao.addRow(new AddRowParam(
+                            new Row(new Object[][] {
+                                { "id", grupo.getId() },
+                                { "nome", grupo.getNome() }
+                            }),
+                            "grupo"
+                        ));
+                    }
+                    livro.setIdGrupo(grupo.getId());
+                }
+
                 // TODO Tratar description quando contiver json.
 
                 result.getLivros().add(livro);
@@ -146,7 +171,8 @@ public class Importa {
                     { "isbn10", livro.getIsbn10() },
                     { "descricao", livro.getDescricao() },
                     { "editoras", livro.getIdsEditoras() },
-                    { "dataPublicacao", livro.getDataPublicacao() }
+                    { "dataPublicacao", livro.getDataPublicacao() },
+                    { "grupo", livro.getIdGrupo() }
                 });
                 dao.addRow(new AddRowParam(
                     row,

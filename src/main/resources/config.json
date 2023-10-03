@@ -43,6 +43,19 @@
                         ]
                     },
                     {
+                        "table_name": "grupo",
+                        "columns": [
+                            {
+                                "column_name": "id",
+                                "column_type": "text"
+                            },
+                            {
+                                "column_name": "nome",
+                                "column_type": "text"
+                            }
+                        ]
+                    },
+                    {
                         "table_name": "livro",
                         "columns": [
                             {
@@ -86,6 +99,14 @@
                                 "column_type": "date",
                                 "column_data": {
                                     "format": "ISO_FORMAT"
+                                }
+                            },
+                            {
+                                "column_name": "grupo",
+                                "column_type": "link",
+                                "column_data": {
+                                    "table": "livro",
+                                    "other_table": "grupo"
                                 }
                             }
                         ]

@@ -18,4 +18,5 @@ public class Livro {
     private String descricao;
     private Collection<String> idsEditoras;
     private Date dataPublicacao;
+    private String idGrupo;
 }

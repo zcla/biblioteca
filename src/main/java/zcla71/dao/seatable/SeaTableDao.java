@@ -399,8 +399,19 @@ public abstract class SeaTableDao {
         for (String rowKey : arParam.getRow().keySet()) {
             Column column = table.getColumns().stream().filter(c -> c.getName().equals(rowKey)).findFirst().get();
             if (column instanceof ColumnLink columnLink) {
-                @SuppressWarnings("unchecked")
-                Collection<String> other_table_row_ids = (Collection<String>) arParam.getRow().get(columnLink.getName());
+                Collection<String> other_table_row_ids = new ArrayList<>();
+                Object obj = arParam.getRow().get(columnLink.getName());
+                if (obj instanceof Collection objC) {
+                    @SuppressWarnings("unchecked")
+                    Collection<String> objCS = objC;
+                    other_table_row_ids.addAll(objCS);
+                } else {
+                    if (obj instanceof String objS) {
+                        other_table_row_ids.add(objS);
+                    } else {
+                        throw new RuntimeException("Coluna não é Collection nem String");
+                    }
+                }
                 if (other_table_row_ids != null) {
                     for (String other_table_row_id : other_table_row_ids) {
                         CreateRowLinkParam crlParam = new CreateRowLinkParam();
