@@ -15,7 +15,7 @@ import zcla71.seatable.model.metadata.colorby.ColorBys;
     @JsonSubTypes.Type(value = ColumnText.class, name = "text"),
     @JsonSubTypes.Type(value = ColumnLongText.class, name = "long-text"),
     @JsonSubTypes.Type(value = ColumnNumber.class, name = "number"),
-    // TODO Collaborator
+    @JsonSubTypes.Type(value = ColumnCollaborator.class, name = "collaborator"),
     @JsonSubTypes.Type(value = ColumnDate.class, name = "date"),
     // TODO Duration
     // TODO SingleSelect

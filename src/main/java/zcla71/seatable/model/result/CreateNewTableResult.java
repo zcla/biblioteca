@@ -4,8 +4,8 @@ import java.util.Collection;
 
 import lombok.Data;
 import zcla71.biblioteca.model.ForceErrorIfNotNull;
-import zcla71.seatable.model.metadata.View;
 import zcla71.seatable.model.metadata.ViewStructure;
+import zcla71.seatable.model.metadata.view.View;
 
 // MUITO parecida com zcla71.seatable.model.metadata.Table, mas dá problema com a propriedade "column" se usar herança.
 @Data

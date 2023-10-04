@@ -6,6 +6,6 @@ import lombok.Data;
 public class ColorByRuleFilter {
     private String column_key;
     private String filter_predicate;
-    private String filter_term;
+    private Object filter_term; // Depende do tipo da coluna
     private String filter_term_modifier; // Só para Date?
 }
