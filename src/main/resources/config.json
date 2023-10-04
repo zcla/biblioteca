@@ -129,6 +129,10 @@
                                     "table": "livro",
                                     "other_table": "tag"
                                 }
+                            },
+                            {
+                                "column_name": "notas",
+                                "column_type": "long-text"
                             }
                         ]
                     }

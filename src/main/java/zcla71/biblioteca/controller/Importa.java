@@ -105,7 +105,7 @@ public class Importa {
                 // isbn10
                 livro.setIsbn10(libibLivro.getUpc_isbn10());
 
-                // description
+                // descricao
                 livro.setDescricao(libibLivro.getDescription());
 
                 // editoras
@@ -190,7 +190,10 @@ public class Importa {
                     }
                 }
 
-                // TODO Tratar description quando contiver json.
+                // notes
+                livro.setNotas(libibLivro.getNotes());
+
+                // TODO Tratar json encontrado nas notas.
 
                 result.getLivros().add(livro);
 
@@ -204,7 +207,8 @@ public class Importa {
                     { "editoras", livro.getIdsEditoras() },
                     { "dataPublicacao", livro.getDataPublicacao() },
                     { "grupo", livro.getIdGrupo() },
-                    { "tags", livro.getIdsTags() }
+                    { "tags", livro.getIdsTags() },
+                    { "notas", livro.getNotas() }
                 });
                 dao.addRow(new AddRowParam(
                     row,

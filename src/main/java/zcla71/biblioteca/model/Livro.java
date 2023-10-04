@@ -20,4 +20,10 @@ public class Livro {
     private Date dataPublicacao;
     private String idGrupo;
     private Collection<String> idsTags;
+    private String notas;
+    // private Integer length;
+    // private String status;
+    // private Date began;
+    // private Date completed;
+    // private Date added;
 }
