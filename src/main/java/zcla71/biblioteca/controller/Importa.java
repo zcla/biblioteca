@@ -20,6 +20,7 @@ import zcla71.biblioteca.model.Autor;
 import zcla71.biblioteca.model.Editora;
 import zcla71.biblioteca.model.Grupo;
 import zcla71.biblioteca.model.Livro;
+import zcla71.biblioteca.model.Tag;
 import zcla71.biblioteca.model.libib.Importacao;
 import zcla71.biblioteca.model.libib.LibibLivro;
 import zcla71.dao.seatable.SeaTableDao;
@@ -45,6 +46,7 @@ public class Importa {
         result.setAutores(new ArrayList<Autor>());
         result.setEditoras(new ArrayList<Editora>());
         result.setGrupos(new ArrayList<Grupo>());
+        result.setTags(new ArrayList<Tag>());
         result.setLivros(new ArrayList<Livro>());
 
         BibliotecaDao dao = BibliotecaDao.getInstance();
@@ -159,6 +161,35 @@ public class Importa {
                     livro.setIdGrupo(grupo.getId());
                 }
 
+                // editoras
+                if (libibLivro.getPublisher() != null) {
+                    livro.setIdsTags(new ArrayList<String>());
+                    if (libibLivro.getTags() != null) {
+                        String[] splTags = libibLivro.getTags().split(",");
+                        for (String strTag : splTags) {
+                            String nomeTag = strTag.trim();
+                            Tag tag = null;
+                            try {
+                                tag = result.getTags().stream().filter(a -> a.getNome().equals(nomeTag)).findFirst().get();
+                            } catch (NoSuchElementException e) {
+                                tag = new Tag();
+                                tag.setId(SeaTableDao.getNewId());
+                                tag.setNome(nomeTag);
+                                result.getTags().add(tag);
+    
+                                dao.addRow(new AddRowParam(
+                                    new Row(new Object[][] {
+                                        { "id", tag.getId() },
+                                        { "nome", tag.getNome() }
+                                    }),
+                                    "tag"
+                                ));
+                            }
+                            livro.getIdsTags().add(tag.getId());
+                        }
+                    }
+                }
+
                 // TODO Tratar description quando contiver json.
 
                 result.getLivros().add(livro);
@@ -172,7 +203,8 @@ public class Importa {
                     { "descricao", livro.getDescricao() },
                     { "editoras", livro.getIdsEditoras() },
                     { "dataPublicacao", livro.getDataPublicacao() },
-                    { "grupo", livro.getIdGrupo() }
+                    { "grupo", livro.getIdGrupo() },
+                    { "tags", livro.getIdsTags() }
                 });
                 dao.addRow(new AddRowParam(
                     row,

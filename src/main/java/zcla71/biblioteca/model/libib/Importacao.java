@@ -7,6 +7,7 @@ import zcla71.biblioteca.model.Autor;
 import zcla71.biblioteca.model.Editora;
 import zcla71.biblioteca.model.Grupo;
 import zcla71.biblioteca.model.Livro;
+import zcla71.biblioteca.model.Tag;
 
 @Data
 public class Importacao {
@@ -14,4 +15,5 @@ public class Importacao {
     private Collection<Editora> editoras;
     private Collection<Grupo> grupos;
     private Collection<Livro> livros;
+    private Collection<Tag> tags;
 }

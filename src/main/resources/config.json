@@ -56,6 +56,19 @@
                         ]
                     },
                     {
+                        "table_name": "tag",
+                        "columns": [
+                            {
+                                "column_name": "id",
+                                "column_type": "text"
+                            },
+                            {
+                                "column_name": "nome",
+                                "column_type": "text"
+                            }
+                        ]
+                    },
+                    {
                         "table_name": "livro",
                         "columns": [
                             {
@@ -107,6 +120,14 @@
                                 "column_data": {
                                     "table": "livro",
                                     "other_table": "grupo"
+                                }
+                            },
+                            {
+                                "column_name": "tags",
+                                "column_type": "link",
+                                "column_data": {
+                                    "table": "livro",
+                                    "other_table": "tag"
                                 }
                             }
                         ]
