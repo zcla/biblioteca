@@ -5,6 +5,7 @@ import java.util.Collection;
 import lombok.Data;
 import zcla71.biblioteca.model.ForceErrorIfNotNull;
 import zcla71.seatable.model.metadata.column.Column;
+import zcla71.seatable.model.metadata.view.View;
 
 @Data
 public class Table {

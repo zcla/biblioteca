@@ -1,4 +1,4 @@
-package zcla71.seatable.model.metadata;
+package zcla71.seatable.model.metadata.view;
 
 import lombok.Data;
 
