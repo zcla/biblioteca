@@ -21,7 +21,7 @@ public class Livro {
     private String idGrupo;
     private Collection<String> idsTags;
     private String notas;
-    // private Integer length;
+    private Integer paginas;
     // private String status;
     // private Date began;
     // private Date completed;

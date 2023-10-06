@@ -14,4 +14,6 @@ public class InsertColumnResultData {
     private Boolean is_row_form_view;
     private String view_id;
     private String format;
+    private String decimal;
+    private String thousands;
 }

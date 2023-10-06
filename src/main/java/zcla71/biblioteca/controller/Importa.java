@@ -190,8 +190,13 @@ public class Importa {
                     }
                 }
 
-                // notes
+                // notas
                 livro.setNotas(libibLivro.getNotes());
+
+                // paginas
+                if (libibLivro.getLength() != null) {
+                    livro.setPaginas(Integer.parseInt(libibLivro.getLength()));
+                }
 
                 // TODO Tratar json encontrado nas notas.
 
@@ -208,7 +213,8 @@ public class Importa {
                     { "dataPublicacao", livro.getDataPublicacao() },
                     { "grupo", livro.getIdGrupo() },
                     { "tags", livro.getIdsTags() },
-                    { "notas", livro.getNotas() }
+                    { "notas", livro.getNotas() },
+                    { "paginas", livro.getPaginas() }
                 });
                 dao.addRow(new AddRowParam(
                     row,

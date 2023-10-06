@@ -133,6 +133,10 @@
                             {
                                 "column_name": "notas",
                                 "column_type": "long-text"
+                            },
+                            {
+                                "column_name": "paginas",
+                                "column_type": "number"
                             }
                         ]
                     }
