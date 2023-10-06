@@ -148,10 +148,10 @@ public abstract class SeaTableDao {
                             InsertColumnParam icParam = new InsertColumnParam(tableDef.getTable_name(), columnDef);
                             @SuppressWarnings("unused")
                             InsertColumnResult icResult = api.insertColumn(icParam);
+                            reloadMetadata = true;
                         }
                     }
                 }
-                reloadMetadata = true;
             }
 
             // Exclui tabelas não previstas na configuração
@@ -185,6 +185,7 @@ public abstract class SeaTableDao {
             // Atualiza metadata
             if (reloadMetadata) {
                 metadata = api.getMetadata();
+                reloadMetadata = false;
             }
 
             if (base.getOptions().getStartup().getEraseData()) {
