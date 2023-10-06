@@ -9,12 +9,10 @@ import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Request.Builder;
-
-import lombok.extern.slf4j.Slf4j;
-
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 
+import lombok.extern.slf4j.Slf4j;
 import zcla71.dao.seatable.config.def.column.ColumnDef;
 import zcla71.seatable.model.BaseToken;
 import zcla71.seatable.model.metadata.Metadata;
@@ -45,8 +43,6 @@ public class SeaTableApi {
     private ObjectMapper objectMapper;
     private BaseToken baseToken = null;
 
-    // TODO Logar as chamadas
-
     public SeaTableApi(String apiToken) throws IOException {
         objectMapper = new ObjectMapper();
         baseToken = generateBaseToken(apiToken);
@@ -56,6 +52,7 @@ public class SeaTableApi {
 
     // https://api.seatable.io/reference/get-base-token-with-api-token
     private BaseToken generateBaseToken(String apiToken) throws IOException {
+        log.info("generateBaseToken");
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
             .url("https://cloud.seatable.io/api/v2.1/dtable/app-access-token/")
@@ -68,12 +65,16 @@ public class SeaTableApi {
         if (response.code() != 200) {
             throw new RuntimeException(responseBody, new RuntimeException(response.message()));
         }
+        log.info(response.code() + ": " + responseBody.length() + " bytes.");
         return objectMapper.readValue(responseBody, BaseToken.class);
     }
 
     // Métodos genéricos
 
-    private Builder prepareBuilder(String url) {
+    private int requestCount = 0;
+
+    private Builder prepareBuilder(String url, String method) {
+        log.info("Request #" + ++requestCount + ": " + method + " " + url.split("\\?")[0]);
         return new Request.Builder()
                 .url(url);
     }
@@ -87,6 +88,7 @@ public class SeaTableApi {
         OkHttpClient client = new OkHttpClient();
         Response response = client.newCall(request).execute();
         String responseBody = response.body().string();
+        log.info("Response " + response.code() + ": " + responseBody.length() + " bytes.");
         if (response.code() != 200) {
             throw new RuntimeException(responseBody, new RuntimeException(response.message()));
         }
@@ -100,30 +102,38 @@ public class SeaTableApi {
         return body;
     }
 
-    public Object doDelete(String url, Object param, Class<? extends Object> resultClass) throws IOException {
-        return completeBuilder(prepareBuilder(url).delete(getRequestBody(param)), resultClass);
+    public <T> T doDelete(String url, Object param, Class<T> resultClass) throws IOException {
+        @SuppressWarnings("unchecked")
+        T result = (T) completeBuilder(prepareBuilder(url, "DELETE").delete(getRequestBody(param)), resultClass);
+        return result;
     }
 
-    public Object doGet(String url, Class<? extends Object> resultClass) throws IOException {
-        return completeBuilder(prepareBuilder(url).get(), resultClass);
+    public <T> T doGet(String url, Class<T> resultClass) throws IOException {
+        @SuppressWarnings("unchecked")
+        T result = (T) completeBuilder(prepareBuilder(url, "GET").get(), resultClass);
+        return result;
     }
 
-    public Object doPost(String url, Object param, Class<? extends Object> resultClass) throws IOException {
-        return completeBuilder(prepareBuilder(url).post(getRequestBody(param)), resultClass);
+    public <T> T doPost(String url, Object param, Class<T> resultClass) throws IOException {
+        @SuppressWarnings("unchecked")
+        T result = (T) completeBuilder(prepareBuilder(url, "POST").post(getRequestBody(param)), resultClass);
+        return result;
     }
 
-    public Object doPut(String url, Object param, Class<? extends Object> resultClass) throws IOException {
-        return completeBuilder(prepareBuilder(url).put(getRequestBody(param)), resultClass);
+    public <T> T doPut(String url, Object param, Class<T> resultClass) throws IOException {
+        @SuppressWarnings("unchecked")
+        T result = (T) completeBuilder(prepareBuilder(url, "PUT").put(getRequestBody(param)), resultClass);
+        return result;
     }
-
-    // TODO Logar os resultados das operações
 
     // Base Info
 
     // https://api.seatable.io/reference/get-metadata
     public Metadata getMetadata() throws IOException {
         String url = "https://cloud.seatable.io/dtable-server/api/v1/dtables/" + baseToken.getDtable_uuid() + "/metadata/";
-        return (Metadata) doGet(url, Metadata.class);
+        Metadata result = doGet(url, Metadata.class);
+        log.info("[Get Metadata] versão: " + result.getMetadata().getFormat_version() + "; tabelas: " + result.getMetadata().getTables().size() + ".");
+        return result;
     }
 
     // Rows
@@ -132,31 +142,41 @@ public class SeaTableApi {
     public ListRowsResult listRows(ListRowsParam param) throws IOException {
         // TODO A API só traz os 1000 primeiros. Fazer mais consultas com o parâmetro "start" até não vir mais nada.
         String url = "https://cloud.seatable.io/dtable-server/api/v1/dtables/" + baseToken.getDtable_uuid() + "/rows/" + param.getUrlParams();
-        return (ListRowsResult) doGet(url, ListRowsResult.class);
+        ListRowsResult result = doGet(url, ListRowsResult.class);
+        log.info("[List Rows] rows: " + result.getRows().size() + ".");
+        return result;
     }
 
     // https://api.seatable.io/reference/list-rows-with-sql
     public ListRowsSqlResult listRowsSql(ListRowsSqlParam param) throws IOException {
         String url = "https://cloud.seatable.io/dtable-db/api/v1/query/" + baseToken.getDtable_uuid() + "/";
-        return (ListRowsSqlResult) doPost(url, param, ListRowsSqlResult.class);
+        ListRowsSqlResult result = doPost(url, param, ListRowsSqlResult.class);
+        log.info("[List Rows (with SQL)] success: " + result.getSuccess() + "; results: " + result.getResults().size() + ".");
+        return result;
     }
 
     // https://api.seatable.io/reference/add-row
     public AddRowResult addRow(AddRowParam param) throws IOException {
         String url = "https://cloud.seatable.io/dtable-server/api/v1/dtables/" + baseToken.getDtable_uuid() + "/rows/";
-        return (AddRowResult) doPost(url, param, AddRowResult.class);
+        AddRowResult result = doPost(url, param, AddRowResult.class);
+        log.info("[Add Row] fields: " + result.size() + ".");
+        return result;
     }
 
     // https://api.seatable.io/reference/append-rows
     public AppendRowsResult appendRows(AppendRowsParam param) throws IOException {
         String url = "https://cloud.seatable.io/dtable-server/api/v1/dtables/" + baseToken.getDtable_uuid() + "/batch-append-rows/";
-        return (AppendRowsResult) doPost(url, param, AppendRowsResult.class);
+        AppendRowsResult result = doPost(url, param, AppendRowsResult.class);
+        log.info("[Append Rows] rows inserted: " + result.getInserted_row_count() + ".");
+        return result;
     }
 
     // https://api.seatable.io/reference/delete-rows
     public DeleteRowsResult deleteRows(DeleteRowsParam param) throws IOException {
         String url = "https://cloud.seatable.io/dtable-server/api/v1/dtables/" + baseToken.getDtable_uuid() + "/batch-delete-rows/";
-        return (DeleteRowsResult) doDelete(url, param, DeleteRowsResult.class);
+        DeleteRowsResult result = doDelete(url, param, DeleteRowsResult.class);
+        log.info("[Delete Rows] rows deleted: " + result.getDeleted_rows() + ".");
+        return result;
     }
 
     // Links
@@ -164,13 +184,17 @@ public class SeaTableApi {
     // https://api.seatable.io/reference/create-row-link
     public CreateRowLinkResult createRowLink(CreateRowLinkParam param) throws IOException {
         String url = "https://cloud.seatable.io/dtable-server/api/v1/dtables/" + baseToken.getDtable_uuid() + "/links/";
-        return (CreateRowLinkResult) doPost(url, param, CreateRowLinkResult.class);
+        CreateRowLinkResult result = doPost(url, param, CreateRowLinkResult.class);
+        log.info("[Create Row Link] success: " + result.getSuccess() + ".");
+        return result;
     }
 
     // https://api.seatable.io/reference/put_dtable-server-api-v1-dtables-base-uuid-batch-update-links
     public CreateRowLinksBatchResult createRowLinksBatch(CreateRowLinksBatchParam param) throws IOException {
         String url = "https://cloud.seatable.io/dtable-server/api/v1/dtables/" + baseToken.getDtable_uuid() + "/batch-update-links/";
-        return (CreateRowLinksBatchResult) doPut(url, param, CreateRowLinksBatchResult.class);
+        CreateRowLinksBatchResult result = doPut(url, param, CreateRowLinksBatchResult.class);
+        log.info("[Create Row Links (Batch)] success: " + result.getSuccess() + ".");
+        return result;
     }
 
     // Tables
@@ -180,7 +204,9 @@ public class SeaTableApi {
         // Está de acordo com a documentação, mas não funciona (nem usando a interface web do site deles).
         // Exemplos: 1. criar campos do tipo número com column_data preenchido; 2. criar colunas do tipo link (que exigem o column_data preenchido).
         String url = "https://cloud.seatable.io/dtable-server/api/v1/dtables/" + baseToken.getDtable_uuid() + "/tables/";
-        return (CreateNewTableResult) doPost(url, param, CreateNewTableResult.class);
+        CreateNewTableResult result = doPost(url, param, CreateNewTableResult.class);
+        log.info("[Create New Table] name: " + result.getName() + ".");
+        return result;
     }
     public CreateNewTableResult createNewTable(CreateNewTableParam param) throws IOException {
         // Gambiarra necessária porque o SeaTable não funciona em certos casos. Ver comentário em createNewTable_NAO_FUNCIONA_100_PORCENTO.
@@ -209,7 +235,9 @@ public class SeaTableApi {
     // https://api.seatable.io/reference/delete-table
     public DeleteTableResult deleteTable(DeleteTableParam param) throws IOException {
         String url = "https://cloud.seatable.io/dtable-server/api/v1/dtables/" + baseToken.getDtable_uuid() + "/tables/";
-        return (DeleteTableResult) doDelete(url, param, DeleteTableResult.class);
+        DeleteTableResult result = doDelete(url, param, DeleteTableResult.class);
+        log.info("[Delete Table] success: " + result.getSuccess() + ".");
+        return result;
     }
 
     // Columns
@@ -217,6 +245,8 @@ public class SeaTableApi {
     // https://api.seatable.io/reference/insert-column
     public InsertColumnResult insertColumn(InsertColumnParam param) throws IOException {
         String url = "https://cloud.seatable.io/dtable-server/api/v1/dtables/" + baseToken.getDtable_uuid() + "/columns/";
-        return (InsertColumnResult) doPost(url, param, InsertColumnResult.class);
+        InsertColumnResult result = doPost(url, param, InsertColumnResult.class);
+        log.info("[Insert Column] name: " + result.getName() + ".");
+        return result;
     }
 }
