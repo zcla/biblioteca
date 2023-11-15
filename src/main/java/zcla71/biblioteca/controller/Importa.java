@@ -2,8 +2,10 @@ package zcla71.biblioteca.controller;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.NoSuchElementException;
 
 import org.springframework.http.MediaType;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
 
@@ -27,6 +30,7 @@ import zcla71.dao.seatable.SeaTableDao;
 import zcla71.dao.seatable.SeaTableDaoException;
 import zcla71.seatable.model.metadata.Row;
 import zcla71.seatable.model.param.AddRowParam;
+import zcla71.utils.Utils;
 
 @RestController
 @RequestMapping(produces={ MediaType.APPLICATION_JSON_VALUE })
@@ -40,7 +44,7 @@ public class Importa {
     public Importacao libibImportacao() throws Exception {
         Collection<LibibLivro> libibLivros = libibLivro();
 
-        // TODO Bolar um jeito de identificar dados existentes com os do libib para fazer importação sem precisar excluir tudo.
+        // TODO Alterar o que tiver nota json com indicação de id; incluir o que não tiver; excluir o que não foi alterado, avisando se houver algum com nota json.
 
         Importacao result = new Importacao();
         result.setAutores(new ArrayList<Autor>());
@@ -56,8 +60,46 @@ public class Importa {
             for (LibibLivro libibLivro : libibLivros) {
                 Livro livro = new Livro();
 
+                // notas
+                String id = null;
+                String editoras = null;
+                Date dataPublicacao = null;
+                Integer paginas = null;
+                if (libibLivro.getNotes() != null) {
+                    try {
+                        Notas notas = Utils.getStringAsObject(Notas.class, libibLivro.getNotes());
+                        if (notas.getId() != null) {
+                            id = notas.getId();
+                        }
+                        if (notas.getEdicao() != null) {
+                            livro.setEdicao(notas.getEdicao());
+                        }
+                        if (notas.getEditora() != null) {
+                            editoras = notas.getEditora();
+                        }
+                        if (notas.getPublicacao() != null) {
+                            String strPublicacao = notas.getPublicacao();
+                            if (strPublicacao.length() == 4) {
+                                strPublicacao += "-01-01";
+                            }
+                            dataPublicacao = (new SimpleDateFormat("yyyy-MM-dd")).parse(strPublicacao);
+                        }
+                        if (notas.getPaginas() != null) {
+                            paginas = notas.getPaginas();
+                        }
+                    } catch (JsonParseException e) {
+                        livro.setNotas(libibLivro.getNotes());
+                    }
+                }
+
                 // id
-                livro.setId(SeaTableDao.getNewId());
+                if (id == null) {
+                    id = SeaTableDao.getNewId();
+                }
+                if ("@isbn13".equals(id)) {
+                    id = "isbn13." + libibLivro.getEan_isbn13();
+                }
+                livro.setId(id);
 
                 // nome
                 String nome = libibLivro.getTitle();
@@ -109,9 +151,12 @@ public class Importa {
                 livro.setDescricao(libibLivro.getDescription());
 
                 // editoras
-                if (libibLivro.getPublisher() != null) {
+                if (editoras == null) {
+                    editoras = libibLivro.getPublisher();
+                }
+                if (editoras != null) {
                     livro.setIdsEditoras(new ArrayList<String>());
-                    String[] splEditoras = libibLivro.getPublisher().split(",");
+                    String[] splEditoras = editoras.split(",");
                     for (String strEditora : splEditoras) {
                         String nomeEditora = strEditora.trim();
                         Editora editora = null;
@@ -136,7 +181,10 @@ public class Importa {
                 }
 
                 // dataPublicacao
-                livro.setDataPublicacao(libibLivro.publish_dateAsDate());
+                if (dataPublicacao == null) {
+                    dataPublicacao = libibLivro.publish_dateAsDate();
+                }
+                livro.setDataPublicacao(dataPublicacao);
 
                 // grupo
                 if (libibLivro.getGroup() != null) {
@@ -162,7 +210,7 @@ public class Importa {
                 }
 
                 // editoras
-                if (libibLivro.getPublisher() != null) {
+                if (editoras != null) {
                     livro.setIdsTags(new ArrayList<String>());
                     if (libibLivro.getTags() != null) {
                         String[] splTags = libibLivro.getTags().split(",");
@@ -190,15 +238,13 @@ public class Importa {
                     }
                 }
 
-                // notas
-                livro.setNotas(libibLivro.getNotes());
-
                 // paginas
-                if (libibLivro.getLength() != null) {
-                    livro.setPaginas(Integer.parseInt(libibLivro.getLength()));
+                if (paginas == null) {
+                    if (libibLivro.getLength() != null) {
+                        paginas = Integer.parseInt(libibLivro.getLength());
+                    }
                 }
-
-                // TODO Tratar json encontrado nas notas.
+                livro.setPaginas(paginas);
 
                 result.getLivros().add(livro);
 

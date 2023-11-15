@@ -26,4 +26,5 @@ public class Livro {
     // private Date began;
     // private Date completed;
     // private Date added;
+    private String edicao;
 }

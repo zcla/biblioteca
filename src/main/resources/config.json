@@ -137,6 +137,10 @@
                             {
                                 "column_name": "paginas",
                                 "column_type": "number"
+                            },
+                            {
+                                "column_name": "edicao",
+                                "column_type": "text"
                             }
                         ]
                     }

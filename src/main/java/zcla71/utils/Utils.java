@@ -10,8 +10,10 @@ import java.nio.charset.StandardCharsets;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Utils {
@@ -28,5 +30,10 @@ public class Utils {
         BufferedReader reader = new BufferedReader(new InputStreamReader(resource.getInputStream()));
         ObjectMapper objectMapper = new ObjectMapper();
         return classe.cast(objectMapper.readValue(reader, classe));
+    }
+
+    public static <T> T getStringAsObject(Class<T> classe, String json) throws JsonMappingException, JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return classe.cast(objectMapper.readValue(json, classe));
     }
 }
