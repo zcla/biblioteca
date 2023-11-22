@@ -9,4 +9,5 @@ public class MetadataMetadata {
     private Collection<Table> tables;
     private Integer version;
     private Integer format_version;
+	private MetadataDescription description;
 }
