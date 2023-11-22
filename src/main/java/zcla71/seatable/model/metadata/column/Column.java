@@ -26,7 +26,7 @@ import zcla71.seatable.model.metadata.colorby.ColorBys;
     // TODO URL
     // TODO Checkbox
     // TODO Rating
-    // TODO Formula
+	@JsonSubTypes.Type(value = ColumnFormula.class, name = "formula"),
     // TODO LinkFormula
     // TODO Geolocation
     @JsonSubTypes.Type(value = ColumnLink.class, name = "link")
