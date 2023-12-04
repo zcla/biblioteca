@@ -11,6 +11,15 @@
 			"installMaven": "true",
 			"installGradle": "false"
 		}
+	},
+
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"humao.rest-client",
+				"mechatroner.rainbow-csv"
+			]
+		}
 	}
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
@@ -18,9 +27,6 @@
 
 	// Use 'postCreateCommand' to run commands after the container is created.
 	// "postCreateCommand": "java -version",
-
-	// Configure tool-specific properties.
-	// "customizations": {},
 
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
 	// "remoteUser": "root"
