@@ -96,6 +96,9 @@ public class Importa {
                 if (id == null) {
                     id = SeaTableDao.getNewId();
                 }
+                if ("@isbn10".equals(id)) {
+                    id = "isbn10." + libibLivro.getUpc_isbn10();
+                }
                 if ("@isbn13".equals(id)) {
                     id = "isbn13." + libibLivro.getEan_isbn13();
                 }
